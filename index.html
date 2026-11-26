@@ -68,7 +68,10 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 .sheet header{padding:calc(14px + env(safe-area-inset-top,0px)) 16px 12px;background:var(--maroon);color:#fff;display:flex;align-items:flex-start;gap:10px}
 .sheet header h2{font:600 18.5px/1.35 var(--display);margin:0}
 .sheet header .org{font-size:13px;color:#f1d9e0;margin-top:3px}
-.sheet header .x{margin-inline-start:auto;background:rgba(255,255,255,.15);border:0;color:#fff;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:18px;flex:none}
+.sheet header .shnav{margin-inline-start:auto;display:flex;gap:6px;flex:none}
+.sheet header .shnav button{background:rgba(255,255,255,.15);border:0;color:#fff;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:18px;display:grid;place-items:center;padding:0}
+.sheet header .shnav button:hover{background:rgba(255,255,255,.28)}
+.sheet header .shnav svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .sheet .body{flex:1;overflow:auto;padding:14px 16px 24px;display:flex;flex-direction:column;gap:14px}
 .media img{width:100%;border-radius:12px;display:block;border:1px solid var(--line);cursor:zoom-in}
 .media video{width:100%;border-radius:12px;display:block;background:#000;max-height:260px}
@@ -171,7 +174,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 
 <!-- لوحة الجناح -->
 <aside class="sheet" id="sheet" aria-hidden="true">
-  <header><div><h2 id="shName"></h2><div class="org" id="shOrg"></div></div><button class="x" id="shClose" aria-label="إغلاق">✕</button></header>
+  <header><div><h2 id="shName"></h2><div class="org" id="shOrg"></div></div><div class="shnav"><button id="shPrev" aria-label="القسم السابق"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button><button id="shNext" aria-label="القسم التالي"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><button class="x" id="shClose" aria-label="إغلاق">✕</button></div></header>
   <div class="body">
     <div class="media" id="shMedia"></div>
     <div class="sec" id="shTitleSec"><h3>عنوان الرحلة</h3><p id="shTitle"></p></div>
@@ -354,17 +357,17 @@ function buildHall(n){
   const rows=Math.max(1,Math.ceil(n/2)); HALL_LEN=22+(rows-1)*BSTEP;
   const zc=ENTRY_Z-HALL_LEN/2;
   const floor=new THREE.Mesh(new THREE.PlaneGeometry(HALL_W,HALL_LEN),floorMat); floor.rotation.x=-Math.PI/2; floor.position.set(0,0,zc); floorTex.repeat.set(HALL_W/2,HALL_LEN/2); hallGroup.add(floor);
-  const ceil=new THREE.Mesh(new THREE.PlaneGeometry(HALL_W,HALL_LEN),ceilMat); ceil.rotation.x=Math.PI/2; ceil.position.set(0,5,zc); hallGroup.add(ceil);
-  const wl=new THREE.Mesh(new THREE.PlaneGeometry(HALL_LEN,5),wallMat); wl.rotation.y=Math.PI/2; wl.position.set(-HALL_W/2,2.5,zc); hallGroup.add(wl);
+  const ceil=new THREE.Mesh(new THREE.PlaneGeometry(HALL_W,HALL_LEN),ceilMat); ceil.rotation.x=Math.PI/2; ceil.position.set(0,4.4,zc); hallGroup.add(ceil);
+  const wl=new THREE.Mesh(new THREE.PlaneGeometry(HALL_LEN,4.4),wallMat); wl.rotation.y=Math.PI/2; wl.position.set(-HALL_W/2,2.2,zc); hallGroup.add(wl);
   const wr=wl.clone(); wr.rotation.y=-Math.PI/2; wr.position.x=HALL_W/2; hallGroup.add(wr);
-  const wf=new THREE.Mesh(new THREE.PlaneGeometry(HALL_W,5),wallMat); wf.position.set(0,2.5,zc-HALL_LEN/2); hallGroup.add(wf);
+  const wf=new THREE.Mesh(new THREE.PlaneGeometry(HALL_W,4.4),wallMat); wf.position.set(0,2.2,zc-HALL_LEN/2); hallGroup.add(wf);
   const wb=wf.clone(); wb.rotation.y=Math.PI; wb.position.z=zc+HALL_LEN/2; hallGroup.add(wb);
   // وزرة سفلية وشريط علوي على الجدارين
   for(const sgn of[-1,1]){
     const skirt=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.34,HALL_LEN),new THREE.MeshStandardMaterial({color:col(0x6E6159),roughness:.6}));
     skirt.position.set(sgn*(HALL_W/2-0.03),0.17,zc); hallGroup.add(skirt);
     const rail=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.05,HALL_LEN),goldMat);
-    rail.position.set(sgn*(HALL_W/2-0.02),4.25,zc); hallGroup.add(rail);
+    rail.position.set(sgn*(HALL_W/2-0.02),3.70,zc); hallGroup.add(rail);
   }
   // سجادة الممر
   const carpet=new THREE.Mesh(new THREE.PlaneGeometry(3.2,HALL_LEN-2),new THREE.MeshStandardMaterial({color:col(0x6e1230),roughness:1})); carpet.rotation.x=-Math.PI/2; carpet.position.set(0,0.01,zc); hallGroup.add(carpet);
@@ -376,11 +379,11 @@ function buildHall(n){
   hallGroup.add(new THREE.HemisphereLight(0xfff4e6,0x3a2a30,.75));
   const amb=new THREE.AmbientLight(0xffffff,.25); hallGroup.add(amb);
   // إنارة مدخل المعرض
-  for(const z of[7.6,3.2,-0.8]){const p=new THREE.PointLight(0xfff0dc,.85,20,1.6);p.position.set(0,4.6,z);hallGroup.add(p);
-    const lamp=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.5),new THREE.MeshBasicMaterial({color:0xfff5e6}));lamp.position.set(0,4.95,z);hallGroup.add(lamp);
-    for(const s of[-1,1]){const wash=new THREE.PointLight(0xfff4e4,.5,7,1.5);wash.position.set(s*(HALL_W/2-1.1),3.5,z);hallGroup.add(wash);}}
-  for(let i=0;i<=rows;i++){const p=new THREE.PointLight(0xfff0dc,.9,22,1.6);p.position.set(0,4.6,BZ0+1.5-i*BSTEP);hallGroup.add(p);
-    const lamp=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.5),new THREE.MeshBasicMaterial({color:0xfff5e6}));lamp.position.copy(p.position);lamp.position.y=4.95;hallGroup.add(lamp);}
+  for(const z of[7.6,3.2,-0.8]){const p=new THREE.PointLight(0xfff0dc,.85,20,1.6);p.position.set(0,4.0,z);hallGroup.add(p);
+    const lamp=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.5),new THREE.MeshBasicMaterial({color:0xfff5e6}));lamp.position.set(0,4.35,z);hallGroup.add(lamp);
+    for(const s of[-1,1]){const wash=new THREE.PointLight(0xfff4e4,.5,7,1.5);wash.position.set(s*(HALL_W/2-1.1),3.2,z);hallGroup.add(wash);}}
+  for(let i=0;i<=rows;i++){const p=new THREE.PointLight(0xfff0dc,.9,22,1.6);p.position.set(0,4.0,BZ0+1.5-i*BSTEP);hallGroup.add(p);
+    const lamp=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.5),new THREE.MeshBasicMaterial({color:0xfff5e6}));lamp.position.copy(p.position);lamp.position.y=4.35;hallGroup.add(lamp);}
   // أعمدة حبل
   for(let i=0;i<=rows*2;i++){for(const s of[-1,1]){const post=new THREE.Mesh(new THREE.CylinderGeometry(.04,.05,.9,12),goldMat);post.position.set(s*2.2,.45,BZ0+1-i*(BSTEP/2));hallGroup.add(post);}}
 }
@@ -408,7 +411,7 @@ function buildStage(farZ){
   const screen=new THREE.Mesh(new THREE.PlaneGeometry(6.1,3.43),screenMat); screen.position.set(0,2.35,farZ+0.47); g.add(screen);
   const podium=new THREE.Mesh(new THREE.BoxGeometry(0.9,1.15,0.6),accentMat); podium.position.set(-3.2,0.98,farZ+3.0); g.add(podium);
   const podTop=new THREE.Mesh(new THREE.BoxGeometry(1.0,0.06,0.7),goldMat); podTop.position.set(-3.2,1.58,farZ+3.0); g.add(podTop);
-  const spot=new THREE.PointLight(0xfff2e0,1.1,10,1.4); spot.position.set(0,4.4,farZ+3); g.add(spot);
+  const spot=new THREE.PointLight(0xfff2e0,1.1,10,1.4); spot.position.set(0,3.9,farZ+3); g.add(spot);
   hallGroup.add(g);
   stage={screenMat,stand:new THREE.Vector3(0,EYE,farZ+9.5),lookAt:new THREE.Vector3(0,2.2,farZ)};
   [plat,frame,screen,podium].forEach(m=>{m.userData.stage=true;clickables.push(m);});
@@ -420,8 +423,9 @@ function goToStage(openAfter){
   // في الشاشات الطولية نبتعد أكثر لرؤية المنصة كاملة
   const aspS=(isFinite(camera.aspect)&&camera.aspect>0)?camera.aspect:1.6;
   // تُحسب المسافة لتملأ المنصة الإطار دون إفراط في الابتعاد (مهم في شاشات الجوال الطولية)
-  to.z=stage.lookAt.z+Math.max(6.5,Math.min(12.5,3.3/(Math.tan(THREE.MathUtils.degToRad(35))*aspS)*1.12));
-  walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,pitchTo:Math.atan2(stage.lookAt.y-EYE,Math.abs(to.z-stage.lookAt.z)),t:0,dur:Math.min(3,0.5+from.distanceTo(to)*0.1),onDone:()=>{if(openAfter)openHead();}};
+  to.z=stage.lookAt.z+Math.max(6.0,Math.min(12.5,3.3/(tanHalfV()*aspS)*1.12));
+  walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,pitchTo:Math.atan2(stage.lookAt.y-EYE,Math.abs(to.z-stage.lookAt.z)),t:0,dur:Math.min(3,0.5+from.distanceTo(to)*0.1),onDone:null};
+  if(openAfter) openHead();
   syncStop(s=>s.kind==='stage');
 }
 function openHead(){
@@ -484,16 +488,20 @@ function buildMentorWall(){
   // لافتة القسم على الجدارين
   for(const s of[-1,1]){
     const sign=new THREE.Mesh(new THREE.PlaneGeometry(3.4,0.62),new THREE.MeshBasicMaterial({map:texCanvas(1360,248,(g,w,h)=>{g.fillStyle='#7E1532';g.fillRect(0,0,w,h);g.fillStyle='#B8933F';g.fillRect(0,h-9,w,9);g.fillStyle='#fff';g.direction='rtl';g.textAlign='center';g.font='500 76px "Noto Kufi Arabic"';g.fillText('كلمات المشرفات الميدانيات',w/2,112);g.font='400 40px "IBM Plex Sans Arabic"';g.fillStyle='#EBD9DE';g.fillText('كلمة كل مؤسسة في شريكاتها من الطالبات',w/2,180);})}));
-    sign.position.set(s*(HALL_W/2-0.05),3.72,zStart+1.55); sign.rotation.y=-s*Math.PI/2; hallGroup.add(sign);
+    sign.position.set(s*(HALL_W/2-0.05),3.40,zStart+1.55); sign.rotation.y=-s*Math.PI/2; hallGroup.add(sign);
   }
 }
 function refreshMentorPlaques(){mentorPlaques.forEach(r=>{r.mat.map=mentorTexture(r.org);r.mat.needsUpdate=true;});}
 function goToMentor(org,open){
   stopTour(); curIdx=-1; const ref=mentorPlaques.find(r=>r.org===org)||mentorPlaques[0]; if(!ref)return;
   const from=camera.position.clone(), to=ref.stand.clone();
+  const aspM=(isFinite(camera.aspect)&&camera.aspect>0)?camera.aspect:1.6;
+  const dM=Math.max(2.4,Math.min(4.6,0.80/(tanHalfV()*aspM)*1.12));
+  to.x=Math.sign(ref.stand.x)*(HALL_W/2-dM);
   const dir=ref.lookAt.clone().sub(to); const yawTo=Math.atan2(-dir.x,-dir.z);
   let dy=yawTo-yaw; dy=Math.atan2(Math.sin(dy),Math.cos(dy));
-  walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,pitchTo:Math.atan2(ref.lookAt.y-EYE,Math.abs(ref.lookAt.x-to.x)),t:0,dur:Math.min(2.6,0.5+from.distanceTo(to)*0.12),onDone:()=>{if(open)openMentor(org);}};
+  walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,pitchTo:Math.atan2(ref.lookAt.y-EYE,Math.abs(ref.lookAt.x-to.x)),t:0,dur:Math.min(2.6,0.5+from.distanceTo(to)*0.12),onDone:null};
+  if(open) openMentor(org);
   syncStop(s=>s.kind==='mentor'&&s.org===ref.org);
 }
 function openMentor(org){
@@ -565,7 +573,7 @@ function buildBooth(b,i){
   const ped=new THREE.Mesh(new THREE.BoxGeometry(0.55,0.95,0.55),new THREE.MeshStandardMaterial({color:col(0xeee6dc),roughness:.8})); ped.position.set(0,0.475,1.7); g.add(ped);
   const badgeTex=texCanvas(256,256,g2=>drawBadge(g2,b.comments||0)); const badge=new THREE.Sprite(new THREE.SpriteMaterial({map:badgeTex,transparent:true,depthWrite:false})); badge.scale.set(.52,.52,1); badge.visible=(b.comments||0)>0; badge.position.set(0,1.35,1.7); g.add(badge);
   const carpet=new THREE.Mesh(new THREE.PlaneGeometry(6.2,3.2),new THREE.MeshStandardMaterial({color:col(0xb08a52),roughness:1})); carpet.rotation.x=-Math.PI/2; carpet.position.set(0,0.012,1.6); g.add(carpet);
-  const spot=new THREE.PointLight(0xfff2e0,.6,7,1.5); spot.position.set(0,3.6,1.5); g.add(spot);
+  const spot=new THREE.PointLight(0xfff2e0,.6,7,1.5); spot.position.set(0,3.4,1.5); g.add(spot);
   // الموضع
   const sideSign=(i%2===0)?-1:1, row=Math.floor(i/2);
   const z=BZ0-row*BSTEP; g.position.set(sideSign*(HALL_W/2-0.1),0,z); g.rotation.y=-sideSign*Math.PI/2;
@@ -611,12 +619,19 @@ function goTo(i,openAfter){
   const ref=boothObjs[i]; if(!ref)return; curIdx=i;
   syncStop(s=>s.kind==='booth'&&s.index===i);
   const from=camera.position.clone(), to=ref.stand.clone();
-  // مسافة الوقوف حسب عرض الشاشة: الشاشات الطولية تحتاج بُعدًا أكبر لرؤية الجناح كاملًا
   const asp=(isFinite(camera.aspect)&&camera.aspect>0)?camera.aspect:1.6;
-  const d=Math.max(3.9,Math.min(5.6,3.7/(Math.tan(THREE.MathUtils.degToRad(35))*asp))); to.x=Math.sign(ref.stand.x)*(HALL_W/2-d);
-  const dir=ref.lookAt.clone().sub(to); const yawTo=Math.atan2(-dir.x,-dir.z);
+  // الشاشات الضيقة لا تسع الجناح كاملًا (عرضه ٦ أمتار) فنقف أمام البوستر نفسه
+  const narrow=asp<0.95;
+  let target=ref.lookAt.clone(), halfW=3.3;
+  if(narrow&&ref.poster){ target=ref.poster.getWorldPosition(new THREE.Vector3()); halfW=1.25; }
+  const d=Math.max(2.7,Math.min(6.2,halfW/(tanHalfV()*asp)*1.12));
+  to.x=Math.sign(ref.stand.x)*(HALL_W/2-d);
+  to.z=target.z;
+  const dir=target.clone().sub(to); const yawTo=Math.atan2(-dir.x,-dir.z);
   let dy=yawTo-yaw; dy=Math.atan2(Math.sin(dy),Math.cos(dy));
-  const dist=from.distanceTo(to); walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,pitchTo:Math.atan2(ref.lookAt.y-EYE,Math.abs(ref.lookAt.x-to.x)),t:0,dur:Math.min(2.6,0.5+dist*0.12),onDone:()=>{if(openAfter)openSheet(ref);}};
+  const dist=from.distanceTo(to);
+  walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,pitchTo:Math.atan2(target.y-EYE,Math.abs(target.x-to.x)),t:0,dur:Math.min(2.6,0.5+dist*0.12),onDone:null};
+  if(openAfter) openSheet(ref);
   updateWhere();
 }
 /* --- تنقّل موحّد بين أقسام المعرض --- */
@@ -651,20 +666,31 @@ function updateWhere(){
   const s=stops[stopIdx];
   w.innerHTML=esc(s.label)+'<small>'+(stopIdx+1)+' / '+stops.length+' · '+esc(s.sub)+'</small>';
 }
-$('navNext').onclick=()=>{stopTour();goStop(stopIdx+1,false);};
-$('navPrev').onclick=()=>{stopTour();goStop(stopIdx-1,false);};
+const autoOpen=()=>innerWidth<700;   // الشاشات الصغيرة: اعرض المحتوى نصًا لا نقشًا على الجدار
+$('shPrev').onclick=()=>{stopTour();goStop(stopIdx-1,true);};
+$('shNext').onclick=()=>{stopTour();goStop(stopIdx+1,true);};
+$('navNext').onclick=()=>{stopTour();goStop(stopIdx+1,autoOpen());};
+$('navPrev').onclick=()=>{stopTour();goStop(stopIdx-1,autoOpen());};
 let tourTimer=null;
 function stopTour(){if(tourTimer){clearTimeout(tourTimer);tourTimer=null;$('navTour').style.color='';}}
 $('navTour').onclick=()=>{
   if(tourTimer){stopTour();return;}
-  const run=()=>{ goStop(stopIdx+1,false); $('navTour').style.color='var(--gold)'; tourTimer=setTimeout(run, stops[stopIdx]&&stops[stopIdx].kind==='stage'?6500:5200); };
+  const run=()=>{
+    const i=(stopIdx+1)%stops.length, kind=stops[i].kind;
+    goStop(i,kind!=='entry');            // تقف عند كل لوحة وجناح وتفتح محتواه
+    $('navTour').style.color='var(--gold)';
+    tourTimer=setTimeout(run, kind==='entry'?2600:(kind==='stage'?7000:5600));
+  };
   $('navTour').style.color='var(--gold)'; run();
 };
 $('btnHead').onclick=()=>goToStage(true);
 $('btnMentors').onclick=()=>{const withWord=mentorPlaques.find(r=>mentorOf(r.org));goToMentor((withWord||mentorPlaques[0]||{}).org,true);};
 
 const clock=new THREE.Clock();
-function resize(){const w=innerWidth||1,h=innerHeight||1;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+const tanHalfV=()=>Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+function resize(){const w=innerWidth||1,h=innerHeight||1;renderer.setSize(w,h,false);camera.aspect=w/h;
+  camera.fov=(camera.aspect<0.72)?52:(camera.aspect<1.1?60:70);
+  camera.updateProjectionMatrix();}
 addEventListener('resize',resize); resize();
 function animate(){
   requestAnimationFrame(animate); const dt=Math.min(clock.getDelta(),0.05);

@@ -230,8 +230,9 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
   <h2>كلمة المشرفة الميدانية</h2>
   <div class="sub" id="mentorOrgLbl"></div>
   <form id="mentorForm">
+    <div class="f"><label>الجهة *</label><select id="mOrg" required></select></div>
     <div class="grid2">
-      <div class="f"><label>الاسم *</label><input id="mName" required maxlength="80"></div>
+      <div class="f"><label>الاسم <span class="note">(اختياري)</span></label><input id="mName" maxlength="80" placeholder="يُترك فارغًا للنشر باسم الجهة"></div>
       <div class="f"><label>المسمى الوظيفي</label><input id="mRole" maxlength="120" placeholder="أخصائية اجتماعية · مشرفة ميدانية"></div>
     </div>
     <div class="f"><label>الكلمة *</label><textarea id="mBody" required maxlength="2000" style="min-height:130px" placeholder="أداء الطالبات في المؤسسة، وأبرز ما أسهمن به، وما تقترحينه على القسم لتطوير التدريب."></textarea></div>
@@ -314,6 +315,7 @@ const scene=new THREE.Scene(); scene.background=new THREE.Color(0x1a1418); scene
 const camera=new THREE.PerspectiveCamera(70,1,0.1,200);
 const EYE=1.6; camera.position.set(0,EYE,7.9);
 let yaw=0, pitch=0; // yaw=0 ⇒ النظر نحو -z
+let yawT=0, pitchT=0;  // هدف النظر — الكاميرا تلاحقه بنعومة بدل القفز الفوري
 const HALL_W=13; let HALL_LEN=40;
 const BZ0=-4, BSTEP=6.3, ENTRY_Z=9;   // بداية الأجنحة، التباعد بينها، جدار المدخل
 const boothObjs=[]; const clickables=[]; let stands=[]; let curIdx=-1;
@@ -412,7 +414,7 @@ function goToStage(openAfter){
   const aspS=(isFinite(camera.aspect)&&camera.aspect>0)?camera.aspect:1.6;
   // تُحسب المسافة لتملأ المنصة الإطار دون إفراط في الابتعاد (مهم في شاشات الجوال الطولية)
   to.z=stage.lookAt.z+Math.max(6.5,Math.min(12.5,3.3/(Math.tan(THREE.MathUtils.degToRad(35))*aspS)*1.12));
-  walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,t:0,dur:Math.min(3,0.5+from.distanceTo(to)*0.1),onDone:()=>{if(openAfter)openHead();}};
+  walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,pitchTo:Math.atan2(stage.lookAt.y-EYE,Math.abs(to.z-stage.lookAt.z)),t:0,dur:Math.min(3,0.5+from.distanceTo(to)*0.1),onDone:()=>{if(openAfter)openHead();}};
   syncStop(s=>s.kind==='stage');
 }
 function openHead(){
@@ -484,7 +486,7 @@ function goToMentor(org,open){
   const from=camera.position.clone(), to=ref.stand.clone();
   const dir=ref.lookAt.clone().sub(to); const yawTo=Math.atan2(-dir.x,-dir.z);
   let dy=yawTo-yaw; dy=Math.atan2(Math.sin(dy),Math.cos(dy));
-  walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,t:0,dur:Math.min(2.6,0.5+from.distanceTo(to)*0.12),onDone:()=>{if(open)openMentor(org);}};
+  walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,pitchTo:Math.atan2(ref.lookAt.y-EYE,Math.abs(ref.lookAt.x-to.x)),t:0,dur:Math.min(2.6,0.5+from.distanceTo(to)*0.12),onDone:()=>{if(open)openMentor(org);}};
   syncStop(s=>s.kind==='mentor'&&s.org===ref.org);
 }
 function openMentor(org){
@@ -502,7 +504,13 @@ function openMentor(org){
   else{$('shActionsSec').hidden=true;}
 }
 let mentorFormOrg='';
-function openMentorForm(org){mentorFormOrg=org;$('mentorOrgLbl').textContent=org;$('mentorForm').reset();$('dropMPhoto').textContent='اضغطي لاختيار صورة';$('dropMPhoto').classList.remove('has');$('mentorOv').classList.add('show');$('mName').focus();}
+function openMentorForm(org){
+  mentorFormOrg=org||'';
+  $('mentorForm').reset(); $('dropMPhoto').textContent='اضغطي لاختيار صورة'; $('dropMPhoto').classList.remove('has');
+  fillOrgSelect(); $('mOrg').value=mentorFormOrg||'';
+  $('mentorOrgLbl').textContent=mentorFormOrg?('مشرفات '+mentorFormOrg):'اختاري جهتك من القائمة';
+  $('mentorOv').classList.add('show');
+}
 
 function boothTextures(b,i){
   const plate=texCanvas(1100,140,(g,w,h)=>{g.fillStyle='#8a1538';g.fillRect(0,0,w,h);g.fillStyle='#c9a24d';g.fillRect(0,h-10,w,10);g.fillStyle='#fff';g.direction='rtl';g.textAlign='right';g.font='600 54px "Noto Kufi Arabic"';g.fillText(b.student_name,w-40,62);g.font='400 36px "IBM Plex Sans Arabic"';g.fillStyle='#EBD9DE';g.fillText(b.org,w-40,116);g.textAlign='left';g.font='500 58px "Noto Kufi Arabic"';g.fillStyle='#C9A96A';g.fillText(String(i+1),40,88);});
@@ -578,7 +586,12 @@ const keys={}; let dragging=false, dragMoved=false, lastX=0,lastY=0; let padDir=
 addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;keys[e.key.toLowerCase()]=true;if(e.key==='Escape')closeSheet();});
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 canvas.addEventListener('pointerdown',e=>{dragging=true;dragMoved=false;lastX=e.clientX;lastY=e.clientY;canvas.classList.add('dragging');canvas.setPointerCapture(e.pointerId);stopTour();});
-canvas.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>3)dragMoved=true;lastX=e.clientX;lastY=e.clientY;yaw-=dx*0.0045;pitch=Math.max(-1,Math.min(1,pitch-dy*0.0035));});
+canvas.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>3)dragMoved=true;lastX=e.clientX;lastY=e.clientY;
+  const touch = e.pointerType === 'touch';
+  const fy = touch ? 0.0019 : 0.0030, fp = touch ? 0.0010 : 0.0016;
+  yawT -= dx*fy;
+  pitchT = Math.max(-0.24, Math.min(0.30, pitchT - dy*fp));
+});
 canvas.addEventListener('pointerup',e=>{dragging=false;canvas.classList.remove('dragging');if(!dragMoved)pick(e.clientX,e.clientY);});
 canvas.addEventListener('pointercancel',()=>{dragging=false;});
 const holdPad=(el,d)=>{el.addEventListener('pointerdown',e=>{e.preventDefault();padDir=d;stopTour();});['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,()=>padDir=0));};
@@ -597,7 +610,7 @@ function goTo(i,openAfter){
   const d=Math.max(3.9,Math.min(5.6,3.7/(Math.tan(THREE.MathUtils.degToRad(35))*asp))); to.x=Math.sign(ref.stand.x)*(HALL_W/2-d);
   const dir=ref.lookAt.clone().sub(to); const yawTo=Math.atan2(-dir.x,-dir.z);
   let dy=yawTo-yaw; dy=Math.atan2(Math.sin(dy),Math.cos(dy));
-  const dist=from.distanceTo(to); walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,t:0,dur:Math.min(2.6,0.5+dist*0.12),onDone:()=>{if(openAfter)openSheet(ref);}};
+  const dist=from.distanceTo(to); walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,pitchTo:Math.atan2(ref.lookAt.y-EYE,Math.abs(ref.lookAt.x-to.x)),t:0,dur:Math.min(2.6,0.5+dist*0.12),onDone:()=>{if(openAfter)openSheet(ref);}};
   updateWhere();
 }
 /* --- تنقّل موحّد بين أقسام المعرض --- */
@@ -650,12 +663,15 @@ function resize(){const w=innerWidth||1,h=innerHeight||1;renderer.setSize(w,h,fa
 addEventListener('resize',resize); resize();
 function animate(){
   requestAnimationFrame(animate); const dt=Math.min(clock.getDelta(),0.05);
-  if(walk){walk.t+=dt/walk.dur;const k=walk.t>=1?1:(1-Math.cos(Math.PI*Math.min(1,walk.t)))/2;camera.position.lerpVectors(walk.from,walk.to,k);yaw=walk.yawFrom+(walk.yawTo-walk.yawFrom)*k;pitch=walk.pitchFrom*(1-k);if(walk.t>=1){const cb=walk.onDone;walk=null;cb&&cb();}}
+  if(walk){walk.t+=dt/walk.dur;const k=walk.t>=1?1:(1-Math.cos(Math.PI*Math.min(1,walk.t)))/2;camera.position.lerpVectors(walk.from,walk.to,k);yaw=walk.yawFrom+(walk.yawTo-walk.yawFrom)*k;pitch=walk.pitchFrom+((walk.pitchTo||0)-walk.pitchFrom)*k;yawT=yaw;pitchT=pitch;if(walk.t>=1){const cb=walk.onDone;walk=null;cb&&cb();}}
   else{
     let f=0,s=0; if(keys['w']||keys['arrowup'])f+=1; if(keys['s']||keys['arrowdown'])f-=1; if(keys['a']||keys['arrowleft'])s-=1; if(keys['d']||keys['arrowright'])s+=1; f+=padDir;
     if(f||s){const sp=3.2*dt;const fx=-Math.sin(yaw),fz=-Math.cos(yaw);camera.position.x+=(fx*f+Math.cos(yaw)*s)*sp;camera.position.z+=(fz*f+(-Math.sin(yaw))*s)*sp;
       const zc=-HALL_LEN/2+12; camera.position.x=Math.max(-HALL_W/2+1.2,Math.min(HALL_W/2-1.2,camera.position.x)); camera.position.z=Math.max(zc-HALL_LEN/2+1,Math.min(zc+HALL_LEN/2-1,camera.position.z));
       $('hint').style.opacity=0;}
+    // ملاحقة ناعمة لهدف النظر — تمتصّ اهتزاز الإصبع على الشاشات اللمسية
+    const sm=1-Math.pow(0.0015,dt);
+    yaw+=(yawT-yaw)*sm; pitch+=(pitchT-pitch)*sm;
   }
   camera.rotation.set(0,0,0,'YXZ'); camera.rotation.y=yaw; camera.rotation.x=pitch;
   // إيقاف الفيديو البعيد
@@ -767,20 +783,36 @@ $('btnList').onclick=()=>$('listOv').classList.add('show'); $('listClose').oncli
 /* ================= المشرفة ================= */
 function applySup(){$('supTag').style.display=supPass?'block':'none';$('btnEditHead').hidden=!supPass;fillList();}
 
+/* --- سجلّ أسماء المشرفات حسب المؤسسة --- */
+let roster={};
+async function loadRoster(){ try{ const {data}=await sb.rpc('gallery_roster_get'); roster=data?JSON.parse(data):{}; }catch(_){ roster={}; } }
+function fillOrgSelect(){
+  const sel=$('mOrg');
+  sel.innerHTML='<option value="">— اختاري الجهة —</option>'+ORGS_WALL.map(o=>'<option value="'+esc(o)+'">مشرفات '+esc(o)+'</option>').join('');
+}
+function chosenMentorName(){
+  const typed=$('mName').value.trim();
+  const org=$('mOrg').value;
+  return typed || (org ? 'مشرفات '+org : '');
+}
+
 /* --- نشر كلمة المشرفة الميدانية --- */
 $('mentorCancel').onclick=()=>$('mentorOv').classList.remove('show');
 $('mentorForm').onsubmit=async e=>{
   e.preventDefault(); const pf=$('mPhoto').files[0];
+  mentorFormOrg=$('mOrg').value;
+  if(!mentorFormOrg){ toast('اختاري المؤسسة التدريبية',true); return; }
+
   const btn=$('mentorSubmit'), prog=$('mentorProg'), bar=prog.firstElementChild, note=$('mentorNote');
   btn.disabled=true; prog.style.display='block';
   try{
     let photo=null;
     if(pf){note.textContent='جارٍ رفع الصورة…';bar.style.width='35%';photo=await upload(await compressImage(pf,1000),'mentors',pf.name);}
     bar.style.width='75%';
-    const {error}=await sb.rpc('gallery_mentor_add',{p_org:mentorFormOrg,p_name:$('mName').value,p_role:$('mRole').value,p_body:$('mBody').value,p_photo:photo});
+    const {error}=await sb.rpc('gallery_mentor_add',{p_org:mentorFormOrg,p_name:chosenMentorName(),p_role:$('mRole').value,p_body:$('mBody').value,p_photo:photo});
     if(error) throw error; bar.style.width='100%';
     await loadMentors(); refreshMentorPlaques();
-    $('mentorOv').classList.remove('show'); toast('نُشرت كلمتك في المعرض'); openMentor(mentorFormOrg);
+    $('mentorOv').classList.remove('show'); toast('نُشرت كلمتك في المعرض'); goToMentor(mentorFormOrg,true);
   }catch(err){console.error(err);toast('تعذّر النشر: '+(err.message||''),true);}
   btn.disabled=false; prog.style.display='none'; bar.style.width='0'; note.textContent='';
 };
@@ -853,7 +885,7 @@ $('btnSound').onclick=()=>setSound(!soundOn);
   await Promise.all([loadBooths(),loadHead(),loadMentors()]); buildAll(); applySup(); animate();
   document.fonts.ready.then(()=>{refreshStage();});
   // حركة دخول: انزلاق هادئ من أعلى المدخل إلى مستوى النظر
-  camera.position.set(0,3.4,8.7); pitch=-0.28; yaw=0;
+  camera.position.set(0,3.4,8.7); pitch=-0.28; yaw=0; pitchT=-0.28; yawT=0;
   walk={from:camera.position.clone(),to:new THREE.Vector3(0,EYE,6.2),yawFrom:0,yawTo:0,pitchFrom:-0.28,t:0,dur:4.5,onDone:null};
   // الصوت لا يبدأ تلقائيًا (سياسة المتصفحات) — يُستأنف عند أول لمسة إن كان مُفعَّلًا سابقًا
   if(store.get('galSound')==='1'){

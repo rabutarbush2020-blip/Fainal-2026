@@ -167,6 +167,86 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 .gstep .gi svg{width:17px;height:17px;fill:none;stroke:var(--maroon);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .gstep b{font:600 14px var(--display);display:block;margin-bottom:2px}
 .gstep p{margin:0;font-size:13px;line-height:1.6;color:var(--muted)}
+/* ===== شريط التنقل: فاتح بلمسة عنّابية وعمق ثلاثي الأبعاد ===== */
+:root{--rose:#9A3B55;--rose-d:#6E2539}
+#nav{background:rgba(255,253,250,.96);border:1px solid var(--line);border-radius:6px;box-shadow:0 22px 40px rgba(40,10,20,.30),0 4px 0 #D9CFC2;transform:translateX(-50%) perspective(900px) rotateX(12deg);transform-origin:50% 100%}
+#nav .nbtn{color:var(--ink);border-radius:4px}
+#nav .nbtn:hover{background:#F3E7EA}
+#nav #navNext{background:var(--rose);color:#fff;box-shadow:0 3px 0 var(--rose-d)}
+#nav #navNext:hover{background:#A9465F}
+#nav .where{color:var(--ink)}
+#nav .where small{color:var(--muted)}
+
+/* ===== مجسّم القاعة ===== */
+#minimap{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:196px;z-index:19;background:rgba(255,253,250,.95);border:1px solid var(--line);border-radius:4px;padding:10px 12px 4px;box-shadow:0 22px 40px rgba(40,10,20,.30),-5px 0 0 #E4DBCF;transform:perspective(1000px) rotateY(-12deg);transform-origin:100% 50%}
+#minimap .mm-h{font:600 13px var(--display);color:var(--ink)}
+#minimap .mm-s{font-size:11px;color:var(--muted)}
+.mm-stage{position:relative;height:178px;perspective:600px}
+.mm-plane{position:absolute;left:50%;top:50%;width:74px;height:168px;margin:-84px 0 0 -37px;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(-30deg);background:#ECE6DC;border:1px solid #BDB3A6}
+.mm-plane .mm-w{position:absolute;box-sizing:border-box;background:rgba(154,59,85,.14);border:1px solid rgba(154,59,85,.45)}
+.mm-plane .mm-wl{left:0;top:0;width:20px;height:100%;transform-origin:0 0;transform:rotateY(-90deg)}
+.mm-plane .mm-wr{left:100%;top:0;width:20px;height:100%;transform-origin:0 0;transform:rotateY(-90deg);background:rgba(154,59,85,.08)}
+.mm-plane .mm-wf{left:0;top:0;width:100%;height:20px;transform-origin:0 0;transform:rotateX(90deg);background:rgba(154,59,85,.22)}
+.mm-plane .mm-path{position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed rgba(25,20,23,.35)}
+.mm-pin{position:absolute;width:16px;height:16px;transform:translate(-50%,-50%);border:0;padding:0;background:transparent;cursor:pointer}
+.mm-pin i{position:absolute;inset:4px;border-radius:50%;background:#fff;border:1px solid var(--rose)}
+.mm-pin.cur i{inset:2px;background:var(--rose)}
+.mm-pin.cur::after{content:'';position:absolute;inset:2px;border-radius:50%;border:2px solid var(--rose);animation:mmPulse 1.6s ease-out infinite}
+@keyframes mmPulse{to{transform:scale(2.6);opacity:0}}
+.mm-me{position:absolute;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 3px rgba(255,255,255,.85);pointer-events:none}
+@media (max-width:700px),(max-height:520px){#minimap{display:none}}
+
+/* ===== الكتاب: قراءة كلمات المشرفات على مكتب خشبي ===== */
+#bookOv{position:fixed;inset:0;z-index:45;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:56px 16px 20px;
+  background-color:#24180F;
+  background-image:radial-gradient(ellipse at 50% 42%,rgba(255,206,150,.20),rgba(0,0,0,0) 58%),
+    repeating-linear-gradient(91deg,rgba(0,0,0,.20) 0 2px,rgba(0,0,0,0) 2px 9px,rgba(255,230,200,.035) 9px 11px,rgba(0,0,0,0) 11px 27px),
+    repeating-linear-gradient(89.4deg,rgba(0,0,0,0) 0 61px,rgba(0,0,0,.16) 61px 63px,rgba(0,0,0,0) 63px 140px),
+    linear-gradient(180deg,#3B281C,#1A110B)}
+#bookOv.show{display:flex}
+#bookOv .bk-x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:14px;width:44px;height:44px;border-radius:4px;border:1px solid rgba(255,255,255,.25);background:rgba(20,14,10,.55);color:#fff;font-size:18px;cursor:pointer}
+.bk-scene{width:min(1000px,100%,calc((100vh - 200px) * 1.55));perspective:1700px}
+.bk{position:relative;width:100%;aspect-ratio:1.55;transform:rotateX(26deg);transform-style:preserve-3d;box-shadow:0 5px 0 #E6DCCB,0 9px 0 #D5C7B1,0 12px 0 #B9A88E}
+.bk::before{content:'';position:absolute;left:2%;right:2%;top:6%;bottom:-7%;background:rgba(0,0,0,.6);filter:blur(24px);transform:translateZ(-40px)}
+.bk-pg{position:absolute;top:0;bottom:0;width:50%;box-sizing:border-box;padding:5.5% 5%;overflow:hidden;color:var(--ink);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.bk-r{right:0;background:linear-gradient(to left,#FBF7EF 82%,#E6DCCB);border-radius:2px 5px 5px 2px}
+.bk-l{left:0;background:linear-gradient(to right,#FBF7EF 82%,#E6DCCB);border-radius:5px 2px 2px 5px}
+.bk-leaf{position:absolute;top:0;bottom:0;width:50%;transform-style:preserve-3d;transition:transform .95s cubic-bezier(.6,.05,.3,1);z-index:2}
+.bk-leaf .bk-pg{left:0;right:0;width:100%}
+.bk-leaf .b{transform:rotateY(180deg)}
+.bk-leaf.to-r{left:0;transform-origin:100% 50%}.bk-leaf.to-r.go{transform:rotateY(180deg)}
+.bk-leaf.to-l{right:0;transform-origin:0 50%}.bk-leaf.to-l.go{transform:rotateY(-180deg)}
+.bk-in{height:100%;display:flex;flex-direction:column;gap:12px;min-height:0}
+.bk-kick{font:500 12.5px var(--display);color:var(--rose);letter-spacing:.4px}
+.bk-num{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bk-org{font:700 clamp(20px,2.6vw,32px)/1.4 var(--display);margin:0}
+.bk-rule{display:block;width:56px;height:3px;background:var(--rose);flex:none}
+.bk-photo{flex:1;min-height:0;width:100%;object-fit:cover;border-radius:2px;filter:saturate(.9)}
+.bk-mono{flex:1;display:grid;place-items:center;font:400 clamp(90px,14vw,170px)/1 var(--quote);color:rgba(154,59,85,.22)}
+.bk-foot{font-size:11px;color:var(--muted);margin-top:auto}
+.bk-quote{font:400 clamp(15px,1.65vw,20px)/1.95 var(--quote);margin:0;flex:1;min-height:0;overflow:auto;white-space:pre-wrap}
+.bk-name{font:600 16px var(--display)}
+.bk-role{font-size:13px;color:var(--muted)}
+.bk-empty{font:400 clamp(17px,1.8vw,22px)/1.8 var(--quote);margin:auto 0 0}
+.bk-empty-s{font-size:13.5px;color:var(--muted);margin:0 0 auto}
+.bk-mob{display:none}
+.bk-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;background:rgba(255,253,250,.96);border:1px solid var(--line);border-radius:6px;padding:8px;box-shadow:0 18px 36px rgba(0,0,0,.45),0 4px 0 #D9CFC2}
+.bk-bar button{min-height:44px;padding:0 14px;border-radius:4px;border:1px solid var(--line);background:#fff;color:var(--ink);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.bk-bar button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bk-bar .pri{background:var(--rose);border-color:var(--rose);color:#fff;box-shadow:0 3px 0 var(--rose-d)}
+.bk-bar .where{min-width:150px;text-align:center;font-weight:700;font-size:13.5px;padding:0 6px}
+.bk-bar .where small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
+@keyframes bkIn{from{transform:rotateY(-75deg);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:700px){
+  .bk-scene{width:min(100%,calc((100vh - 230px) * .74))}
+  .bk{aspect-ratio:.74;transform:rotateX(14deg)}
+  .bk-r{display:none}
+  .bk-l{width:100%;border-radius:5px;padding:7% 7%}
+  .bk-l.turn{transform-origin:100% 50%;animation:bkIn .7s cubic-bezier(.2,.8,.2,1)}
+  .bk-mob{display:flex;flex-direction:column;gap:8px}
+  .bk-bar .where{min-width:0;flex:1 1 100%;order:-1}
+}
+@media (prefers-reduced-motion:reduce){.bk-leaf{transition:none}.bk-l.turn{animation:none}}
 @media (prefers-reduced-motion:reduce){.sheet{transition:none}}
 </style>
 </head>
@@ -213,6 +293,26 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
   <div class="where" id="navWhere">مدخل المعرض<small>—</small></div>
   <button class="nbtn" id="navNext">التالي <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
   <button class="nbtn" id="navTour" title="جولة تلقائية"><svg viewBox="0 0 24 24"><path d="M5 4l14 8-14 8z"/></svg></button>
+</div>
+
+<!-- مجسّم القاعة -->
+<section id="minimap" aria-label="مجسّم القاعة">
+  <div class="mm-h">مُجسّم القاعة</div>
+  <div class="mm-s">انقري نقطة للانتقال إليها</div>
+  <div class="mm-stage"><div class="mm-plane" id="mmPlane"><span class="mm-w mm-wl"></span><span class="mm-w mm-wr"></span><span class="mm-w mm-wf"></span><span class="mm-path"></span><div id="mmPins"></div><span class="mm-me" id="mmMe"></span></div></div>
+</section>
+
+<!-- كتاب كلمات المشرفات -->
+<div id="bookOv" role="dialog" aria-modal="true" aria-label="كلمات المشرفات الميدانيات" aria-hidden="true">
+  <button class="bk-x" id="bkClose" aria-label="إغلاق الكتاب">✕</button>
+  <div class="bk-scene"><div class="bk" id="bk"><div class="bk-pg bk-r" id="bkR"></div><div class="bk-pg bk-l" id="bkL"></div></div></div>
+  <div class="bk-bar">
+    <button id="bkPrev"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg> الكلمة السابقة</button>
+    <div class="where" id="bkWhere"></div>
+    <button class="pri" id="bkNext">الكلمة التالية <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button id="bkAdd"></button>
+    <button id="bkHide" hidden>إخفاء الكلمة</button>
+  </div>
 </div>
 
 <!-- لوحة الجناح -->
@@ -605,8 +705,9 @@ function buildMentorWall(){
   mentorPlaques.length=0;
   const zStart=7.0, step=1.72, per=Math.ceil(ORGS_WALL.length/2);
   ORGS_WALL.forEach((org,i)=>{
-    const side=(i%2===0)?1:-1, k=Math.floor(i/2);
-    const x=side*(HALL_W/2-0.06), z=zStart-k*step;
+    // لوحات متتابعة بالتناوب: لكل كلمة عمقها الخاص فلا تتقابل لوحتان (من كلمة إلى كلمة)
+    const side=(i%2===0)?1:-1;
+    const x=side*(HALL_W/2-0.06), z=zStart-i*(step/2);
     const g=new THREE.Group();
     const frame=new THREE.Mesh(new THREE.BoxGeometry(1.5,2.06,0.07),darkMat); frame.position.set(0,1.95,0.02); g.add(frame);
     const mat=new THREE.MeshBasicMaterial({map:mentorTexture(org)});
@@ -636,19 +737,69 @@ function goToMentor(org,open){
   if(open) openMentor(org);
   syncStop(s=>s.kind==='mentor'&&s.org===ref.org);
 }
-function openMentor(org){
-  openRef=null; const m=mentorOf(org);
-  sheet.classList.add('open'); sheet.setAttribute('aria-hidden','false');
-  $('shName').textContent=m?m.mentor_name:'كلمة المشرفة الميدانية'; $('shOrg').textContent=orgName(org);
-  const md=$('shMedia'); md.innerHTML='';
-  if(m?.photo_url){const im=new Image();im.src=m.photo_url;im.alt=m.mentor_name;im.onclick=()=>{$('zoomImg').src=m.photo_url;$('zoomOv').classList.add('show');};md.appendChild(im);}
-  ['shTitleSec','shJourneySec','shHiSec','shCommentsSec','shMentorSec'].forEach(id=>$(id).hidden=true); $('composer').hidden=true;
-  $('shMsgSec').hidden=false; $('shMsgSec').querySelector('h3').textContent=m?('المسمى: '+(m.role_title||'مشرفة ميدانية')):'كلمة المشرفة الميدانية';
-  $('shMsg').textContent=m?m.body:'لم تُضَف كلمة المشرفة الميدانية لهذه المؤسسة بعد.';
-  const act=$('shActions'); act.innerHTML=''; $('shActionsSec').hidden=false;
-  const addb=document.createElement('button'); addb.className='btn'; addb.textContent=m?'أضيفي كلمة أخرى':'أضيفي كلمتك'; addb.onclick=()=>openMentorForm(org); act.appendChild(addb);
-  if(m&&supPass){const b=document.createElement('button');b.className='btn ghost';b.textContent='إخفاء الكلمة';b.onclick=async()=>{if(!confirm('إخفاء كلمة المشرفة من المعرض؟'))return;const {error}=await sb.rpc('gallery_mod',{p_pass:supPass,p_kind:'mentor',p_id:m.id,p_hidden:true});if(error){toast('فشل الإخفاء',true);return;}toast('أُخفيت الكلمة');await loadMentors();refreshMentorPlaques();openMentor(org);};act.appendChild(b);}
+function openMentor(org){ openBook(org); }
+
+/* --- الكتاب ثلاثي الأبعاد: كلمة في كل صفحتين، و«التالية» تقلب الصفحة --- */
+let bookOrg=null, bookDir=0;
+const mIdx=o=>mentorPlaques.findIndex(r=>r.org===o);
+function bookPages(org){
+  const m=mentorOf(org), k=mIdx(org), n=mentorPlaques.length, title='مشرفات '+orgName(org);
+  const head='<span class="bk-kick">كلمة المشرفة الميدانية</span><h3 class="bk-org">'+esc(title)+'</h3>';
+  const right='<div class="bk-in">'+head+'<span class="bk-num">الكلمة '+(k+1)+' من '+n+'</span><span class="bk-rule"></span>'
+    +(m&&m.photo_url?'<img class="bk-photo" src="'+esc(m.photo_url)+'" alt="'+esc(m.mentor_name||title)+'">':'<span class="bk-mono" aria-hidden="true">«</span>')
+    +'<span class="bk-foot">المعرض الافتراضي للتدريب الميداني · قسم العلوم الاجتماعية</span></div>';
+  const left='<div class="bk-in"><div class="bk-mob">'+head+'<span class="bk-rule"></span></div>'
+    +(m?'<p class="bk-quote">«'+esc(m.body)+'»</p><span class="bk-rule"></span><b class="bk-name">'+esc(m.mentor_name||title)+'</b><span class="bk-role">'+esc(m.role_title||'مشرفة ميدانية')+' · '+esc(orgName(org))+'</span>'
+       :'<p class="bk-empty">لم تُضَف كلمة '+esc(title)+' بعد.</p><p class="bk-empty-s">يمكن للمشرفة الميدانية إضافة كلمتها من الزر أدناه.</p>')
+    +'</div>';
+  return {right,left};
 }
+function finishLeaf(){const lf=$('bk').querySelector('.bk-leaf');if(lf&&lf._done)lf._done();}
+function openBook(org){
+  if(!org)return;
+  closeSheet();
+  const ov=$('bookOv'), pg=bookPages(org), was=ov.classList.contains('show')&&bookOrg&&bookOrg!==org;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches, narrow=innerWidth<700;
+  finishLeaf();
+  if(!was||reduce){ $('bkR').innerHTML=pg.right; $('bkL').innerHTML=pg.left; }
+  else if(narrow){ const L=$('bkL'); L.innerHTML=pg.left; $('bkR').innerHTML=pg.right; L.classList.remove('turn'); void L.offsetWidth; L.classList.add('turn'); }
+  else{
+    const dir=bookDir||(mIdx(org)>mIdx(bookOrg)?1:-1), leaf=document.createElement('div');
+    if(dir>0){ // صفحة اليسار تنقلب نحو اليمين (اتجاه الكتاب العربي)
+      leaf.className='bk-leaf to-r'; leaf.innerHTML='<div class="bk-pg bk-l f">'+$('bkL').innerHTML+'</div><div class="bk-pg bk-r b">'+pg.right+'</div>';
+      $('bkL').innerHTML=pg.left;
+    }else{
+      leaf.className='bk-leaf to-l'; leaf.innerHTML='<div class="bk-pg bk-r f">'+$('bkR').innerHTML+'</div><div class="bk-pg bk-l b">'+pg.left+'</div>';
+      $('bkR').innerHTML=pg.right;
+    }
+    leaf._done=()=>{ if(leaf._fin)return; leaf._fin=1; if(dir>0)$('bkR').innerHTML=pg.right; else $('bkL').innerHTML=pg.left; leaf.remove(); };
+    $('bk').appendChild(leaf);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>leaf.classList.add('go')));
+    leaf.addEventListener('transitionend',leaf._done,{once:true}); setTimeout(leaf._done,1300);
+  }
+  bookDir=0; bookOrg=org;
+  ov.classList.add('show'); ov.setAttribute('aria-hidden','false');
+  const m=mentorOf(org), k=mIdx(org);
+  $('bkWhere').innerHTML=esc('مشرفات '+orgName(org))+'<small>الكلمة '+(k+1)+' من '+mentorPlaques.length+'</small>';
+  $('bkAdd').textContent=m?'أضيفي كلمة أخرى':'أضيفي كلمتك';
+  $('bkHide').hidden=!(m&&supPass);
+}
+function closeBook(){ finishLeaf(); const ov=$('bookOv'); ov.classList.remove('show'); ov.setAttribute('aria-hidden','true'); bookOrg=null; }
+function bookStep(d){
+  const n=mentorPlaques.length; if(!n||!bookOrg)return;
+  const r=mentorPlaques[(mIdx(bookOrg)+d+n)%n]; stopTour(); bookDir=d; goToMentor(r.org,true);
+}
+$('bkClose').onclick=closeBook;
+$('bkNext').onclick=()=>bookStep(1);
+$('bkPrev').onclick=()=>bookStep(-1);
+$('bkAdd').onclick=()=>{ if(bookOrg) openMentorForm(bookOrg); };
+$('bkHide').onclick=async()=>{
+  const org=bookOrg, m=mentorOf(org); if(!m||!supPass)return;
+  if(!confirm('إخفاء كلمة المشرفة من المعرض؟'))return;
+  const {error}=await sb.rpc('gallery_mod',{p_pass:supPass,p_kind:'mentor',p_id:m.id,p_hidden:true});
+  if(error){toast('فشل الإخفاء',true);return;}
+  toast('أُخفيت الكلمة'); await loadMentors(); refreshMentorPlaques(); bookOrg=null; openBook(org);
+};
 let mentorFormOrg='';
 function openMentorForm(org){
   mentorFormOrg=org||'';
@@ -800,7 +951,10 @@ function buildAll(){
 
 /* ================= التحكم والحركة ================= */
 const keys={}; let dragging=false, dragMoved=false, lastX=0,lastY=0; let padDir=0;
-addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;keys[e.key.toLowerCase()]=true;if(e.key==='Escape')closeSheet();});
+addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;
+  if($('bookOv').classList.contains('show')&&!document.querySelector('.ov.show')){
+    if(e.key==='Escape')closeBook(); else if(e.key==='ArrowLeft'){e.preventDefault();bookStep(1);} else if(e.key==='ArrowRight'){e.preventDefault();bookStep(-1);}
+    return;}keys[e.key.toLowerCase()]=true;if(e.key==='Escape')closeSheet();});
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 canvas.addEventListener('pointerdown',e=>{dragging=true;dragMoved=false;lastX=e.clientX;lastY=e.clientY;canvas.classList.add('dragging');canvas.setPointerCapture(e.pointerId);stopTour();});
 canvas.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>3)dragMoved=true;lastX=e.clientX;lastY=e.clientY;
@@ -845,13 +999,32 @@ function buildStops(){
     stops.push({kind:'mentor',org:r.org,label:'مشرفات '+orgName(r.org),sub:m?(m.mentor_name||'كلمة منشورة'):'بانتظار الكلمة'});});
   boothObjs.forEach((r,i)=>stops.push({kind:'booth',index:i,label:r.b.student_name,sub:orgName(r.b.org)}));
   stops.push({kind:'stage',label:'منصة الافتتاح',sub:'كلمة رئيس القسم'});
-  stopIdx=0; updateWhere(); fillList();
+  stopIdx=0; buildMinimap(); updateWhere(); fillList();
+}
+/* --- مجسّم القاعة: نقطة لكل وقفة، والنقطة الداكنة موقع الزائرة --- */
+function mmPct(x,z){
+  const mx=Math.max(6,Math.min(94,(x+HALL_W/2)/HALL_W*100));
+  const my=Math.max(3,Math.min(97,100-(ENTRY_Z-z)/HALL_LEN*100));
+  return {mx,my};
+}
+function stopWorld(s){
+  if(s.kind==='entry') return {x:0,z:ENTRY_Z-2.8};
+  if(s.kind==='mentor'){const r=mentorPlaques.find(p=>p.org===s.org);return r?{x:r.lookAt.x,z:r.lookAt.z}:{x:0,z:0};}
+  if(s.kind==='booth'){const r=boothObjs[s.index];return r?{x:r.lookAt.x,z:r.lookAt.z}:{x:0,z:0};}
+  return stage?{x:0,z:stage.lookAt.z}:{x:0,z:ENTRY_Z-HALL_LEN};
+}
+function buildMinimap(){
+  const box=$('mmPins'); if(!box)return;
+  box.innerHTML=stops.map((s,i)=>{const w=stopWorld(s),p=mmPct(w.x,w.z);
+    return '<button class="mm-pin" data-s="'+i+'" style="left:'+p.mx+'%;top:'+p.my+'%" aria-label="'+esc(s.label)+'" title="'+esc(s.label)+'"><i></i></button>';}).join('');
+  box.querySelectorAll('.mm-pin').forEach(b=>b.onclick=()=>{stopTour();goStop(+b.dataset.s,autoOpen());});
 }
 function syncStop(pred){ const i=stops.findIndex(pred); if(i>=0){stopIdx=i;} updateWhere(); }
 function goStop(i,open){
   if(!stops.length) return;
   stopIdx=(i%stops.length+stops.length)%stops.length;
   const s=stops[stopIdx];
+  if(s.kind!=='mentor') closeBook();
   if(s.kind==='entry') goEntry();
   else if(s.kind==='mentor') goToMentor(s.org,open);
   else if(s.kind==='booth') goTo(s.index,open);
@@ -868,6 +1041,7 @@ function updateWhere(){
   const w=$('navWhere'); if(!stops.length){w.innerHTML='مدخل المعرض<small>—</small>';return;}
   const s=stops[stopIdx];
   w.innerHTML=esc(s.label)+'<small>'+(stopIdx+1)+' / '+stops.length+' · '+esc(s.sub)+'</small>';
+  document.querySelectorAll('#mmPins .mm-pin').forEach(b=>b.classList.toggle('cur',+b.dataset.s===stopIdx));
 }
 const autoOpen=()=>innerWidth<700;   // الشاشات الصغيرة: اعرض المحتوى نصًا لا نقشًا على الجدار
 $('shPrev').onclick=()=>{stopTour();goStop(stopIdx-1,true);};
@@ -881,15 +1055,16 @@ $('navTour').onclick=()=>{
   const run=()=>{
     const i=(stopIdx+1)%stops.length, kind=stops[i].kind;
     goStop(i,kind!=='entry');            // تقف عند كل لوحة وجناح وتفتح محتواه
-    $('navTour').style.color='var(--gold)';
+    $('navTour').style.color='var(--rose)';
     tourTimer=setTimeout(run, kind==='entry'?2600:(kind==='stage'?7000:5600));
   };
-  $('navTour').style.color='var(--gold)'; run();
+  $('navTour').style.color='var(--rose)'; run();
 };
 $('btnHead').onclick=()=>goToStage(true);
 $('btnMentors').onclick=()=>{const withWord=mentorPlaques.find(r=>mentorOf(r.org));goToMentor((withWord||mentorPlaques[0]||{}).org,true);};
 
 const clock=new THREE.Clock();
+const mmMe=$('mmMe'); let mmTick=0;
 const tanHalfV=()=>Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
 function resize(){const w=innerWidth||1,h=innerHeight||1;renderer.setSize(w,h,false);camera.aspect=w/h;
   camera.fov=(camera.aspect<0.72)?52:(camera.aspect<1.1?60:70);
@@ -908,6 +1083,7 @@ function animate(){
     yaw+=(yawT-yaw)*sm; pitch+=(pitchT-pitch)*sm;
   }
   camera.rotation.set(0,0,0,'YXZ'); camera.rotation.y=yaw; camera.rotation.x=pitch;
+  if(mmMe&&(++mmTick%6===0)){const p=mmPct(camera.position.x,camera.position.z);mmMe.style.left=p.mx+'%';mmMe.style.top=p.my+'%';}
   // إيقاف الفيديو البعيد
   renderer.render(scene,camera);
 }

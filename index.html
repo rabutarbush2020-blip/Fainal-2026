@@ -128,6 +128,10 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 .list button:hover{border-color:var(--maroon)}
 .list .n{width:30px;height:30px;border-radius:50%;background:var(--maroon);color:#fff;display:grid;place-items:center;font-weight:700;flex:none;font-variant-numeric:tabular-nums}
 .list .t{flex:1}.list .t small{display:block;color:var(--muted);font-size:12px}
+.list .lhead{font:500 11px var(--display);color:var(--maroon);letter-spacing:.8px;margin:10px 2px 2px}
+.list .lhead:first-child{margin-top:0}
+.list button.cur{border-color:var(--maroon);background:#FBF4F6}
+.list .n{font-size:15px}
 .toast{position:fixed;top:calc(70px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--card);color:var(--ink);padding:10px 16px;border-radius:3px;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:60;font-weight:700;display:none;border-inline-start:4px solid var(--maroon)}
 .toast.err{border-color:var(--danger)}
 #loader{position:fixed;inset:0;background:#141013;color:#fff;display:grid;place-items:center;z-index:70;font:500 15px var(--display);letter-spacing:.4px;transition:opacity .6s}
@@ -144,7 +148,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 <div id="top">
   <div class="brand"><span class="dot"></span><div><h1><span class="full">المعرض الافتراضي للتدريب الميداني</span><span class="short">المعرض الافتراضي</span></h1><small>قسم العلوم الاجتماعية · جامعة قطر</small></div></div>
   <span class="spacer"></span>
-  <button class="tbtn" id="btnList" title="قائمة الأجنحة"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span class="lbl">الأجنحة</span></button>
+  <button class="tbtn" id="btnList" title="أقسام المعرض"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span class="lbl">الأقسام</span></button>
   <button class="tbtn primary" id="btnAdd" title="أضيفي جناحك"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">أضيفي جناحك</span></button>
   <button class="tbtn" id="btnHead" title="كلمة رئيس القسم"><svg viewBox="0 0 24 24"><path d="M21 5.5v8a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3.5V16H5.5A2.5 2.5 0 0 1 3 13.5v-8A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5z"/><path d="M9.3 7.4v3.3M14.7 7.4v3.3"/></svg><span class="lbl">كلمة رئيس القسم</span></button>
   <button class="tbtn" id="btnMentors" title="كلمات المشرفات الميدانيات"><svg viewBox="0 0 24 24"><path d="M16.5 3h-11A2.5 2.5 0 0 0 3 5.5v6A2.5 2.5 0 0 0 5.5 14H6v3.2L9.8 14h6.7A2.5 2.5 0 0 0 19 11.5v-6A2.5 2.5 0 0 0 16.5 3z"/><path d="M19.5 8.4A2.5 2.5 0 0 1 21 10.7v5.8a2.5 2.5 0 0 1-2.5 2.5H18v2.6L14.8 19h-2.3"/></svg><span class="lbl">كلمات المشرفات</span></button>
@@ -217,7 +221,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 
 <!-- قائمة الأجنحة -->
 <div class="ov" id="listOv"><div class="card">
-  <h2>أجنحة المعرض</h2><div class="sub">اختاري جناحًا للانتقال إليه مباشرة</div>
+  <h2>أقسام المعرض</h2><div class="sub">اختاري قسمًا للانتقال إليه مباشرة</div>
   <div class="list" id="boothList"></div>
   <div class="actions"><button type="button" class="btn ghost" id="listClose">إغلاق</button></div>
 </div></div>
@@ -580,7 +584,7 @@ function updateBadge(ref,n){ref.b.comments=n;ref.badge.visible=n>0;drawBadge(ref
 function buildAll(){
   boothObjs.forEach(r=>{scene.remove(r.g);}); boothObjs.length=0; clickables.length=0;
   buildHall(booths.length); booths.forEach((b,i)=>buildBooth(b,i));
-  fillList(); buildStops();
+  buildStops();
 }
 
 /* ================= التحكم والحركة ================= */
@@ -619,12 +623,11 @@ function goTo(i,openAfter){
 let stops=[], stopIdx=0;
 function buildStops(){
   stops=[{kind:'entry',label:'مدخل المعرض',sub:(booths.length||0)+' جناح'}];
-  const withWord=mentorPlaques.filter(r=>mentorOf(r.org));
-  if(withWord.length) withWord.forEach(r=>stops.push({kind:'mentor',org:r.org,label:'كلمة المشرفة الميدانية',sub:orgName(r.org)}));
-  else if(mentorPlaques.length) stops.push({kind:'mentor',org:mentorPlaques[0].org,label:'كلمات المشرفات الميدانيات',sub:'بانتظار الكلمات'});
+  mentorPlaques.forEach(r=>{const m=mentorOf(r.org);
+    stops.push({kind:'mentor',org:r.org,label:'مشرفات '+orgName(r.org),sub:m?(m.mentor_name||'كلمة منشورة'):'بانتظار الكلمة'});});
   boothObjs.forEach((r,i)=>stops.push({kind:'booth',index:i,label:r.b.student_name,sub:orgName(r.b.org)}));
   stops.push({kind:'stage',label:'منصة الافتتاح',sub:'كلمة رئيس القسم'});
-  stopIdx=0; updateWhere();
+  stopIdx=0; updateWhere(); fillList();
 }
 function syncStop(pred){ const i=stops.findIndex(pred); if(i>=0){stopIdx=i;} updateWhere(); }
 function goStop(i,open){
@@ -778,8 +781,34 @@ $('addForm').onsubmit=async e=>{
 };
 
 /* ================= القائمة ================= */
-function fillList(){$('boothList').innerHTML=booths.map((b,i)=>`<button data-i="${i}"><span class="n">${i+1}</span><span class="t">${esc(b.student_name)}<small>${esc(orgName(b.org))}${b.title?' · '+esc(b.title):''}</small></span>${supPass&&!b.demo?`<span class="hide" data-hb="${b.id}" style="color:var(--danger);font-size:12px">إخفاء</span>`:''}</button>`).join('')||'<div class="empty">لا أجنحة بعد</div>';
-  $('boothList').querySelectorAll('button').forEach(btn=>btn.onclick=async e=>{const hb=e.target.dataset.hb;if(hb){if(!confirm('إخفاء هذا الجناح من المعرض؟'))return;const {error}=await sb.rpc('gallery_mod',{p_pass:supPass,p_kind:'booth',p_id:+hb,p_hidden:true});if(error)toast('فشل',true);else{toast('أُخفي الجناح');await loadBooths();buildAll();}return;}$('listOv').classList.remove('show');goTo(+btn.dataset.i,true);});}
+/* ================= فهرس أقسام المعرض ================= */
+const STOP_ICON={entry:'⌂',mentor:'❝',booth:'▣',stage:'✦'};
+function fillList(){
+  const box=$('boothList');
+  if(!stops.length){ box.innerHTML='<div class="empty">—</div>'; return; }
+  let html='', lastKind='';
+  stops.forEach((s,i)=>{
+    if(s.kind!==lastKind){
+      lastKind=s.kind;
+      const head={entry:'المدخل',mentor:'كلمات المشرفات الميدانيات',booth:'أجنحة المؤسسات',stage:'منصة الافتتاح'}[s.kind];
+      html+='<div class="lhead">'+head+'</div>';
+    }
+    const b=(s.kind==='booth')?booths[s.index]:null;
+    html+='<button data-s="'+i+'"'+(i===stopIdx?' class="cur"':'')+'><span class="n">'+(STOP_ICON[s.kind]||'•')+'</span>'
+       +'<span class="t">'+esc(s.label)+'<small>'+esc(s.sub)+'</small></span>'
+       +((b&&supPass&&!b.demo)?'<span class="hide" data-hb="'+b.id+'" style="color:var(--danger);font-size:12px">إخفاء</span>':'')
+       +'</button>';
+  });
+  box.innerHTML=html;
+  box.querySelectorAll('button').forEach(btn=>btn.onclick=async e=>{
+    const hb=e.target.dataset.hb;
+    if(hb){ if(!confirm('إخفاء هذا الجناح من المعرض؟'))return;
+      const {error}=await sb.rpc('gallery_mod',{p_pass:supPass,p_kind:'booth',p_id:+hb,p_hidden:true});
+      if(error)toast('فشل',true); else {toast('أُخفي الجناح'); await loadBooths(); buildAll();} return; }
+    $('listOv').classList.remove('show');
+    goStop(+btn.dataset.s,true);
+  });
+}
 $('btnList').onclick=()=>$('listOv').classList.add('show'); $('listClose').onclick=()=>$('listOv').classList.remove('show');
 
 /* ================= المشرفة ================= */

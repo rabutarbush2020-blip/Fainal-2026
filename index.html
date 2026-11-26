@@ -722,6 +722,11 @@ function buildMentorWall(){
     [frame,face,shelf].forEach(o=>{o.userData.mentor=ref;clickables.push(o);});
     mentorPlaques.push(ref);
   });
+  // ترتيب التنقل على جدار واحد ثم الآخر (لا قفز إلى الجدار المقابل مع كل كلمة):
+  // الجدار الأيمن تقدّمًا نحو عمق القاعة، ثم الأيسر عودةً نحو المدخل — عبور واحد فقط
+  const onR=mentorPlaques.filter(r=>r.lookAt.x>0).sort((a,b)=>b.lookAt.z-a.lookAt.z);
+  const onL=mentorPlaques.filter(r=>r.lookAt.x<0).sort((a,b)=>a.lookAt.z-b.lookAt.z);
+  mentorPlaques.splice(0,mentorPlaques.length,...onR,...onL);
   // لافتة القسم على الجدارين
   for(const s of[-1,1]){
     const sign=new THREE.Mesh(new THREE.PlaneGeometry(3.4,0.62),new THREE.MeshBasicMaterial({map:texCanvas(1360,248,(g,w,h)=>{g.fillStyle='#7E1532';g.fillRect(0,0,w,h);g.fillStyle='#B8933F';g.fillRect(0,h-9,w,9);g.fillStyle='#fff';g.direction='rtl';g.textAlign='center';g.font='500 76px "Noto Kufi Arabic"';g.fillText('كلمات المشرفات الميدانيات',w/2,112);g.font='400 40px "IBM Plex Sans Arabic"';g.fillStyle='#EBD9DE';g.fillText('كلمة كل مؤسسة في شريكاتها من الطالبات',w/2,180);})}));

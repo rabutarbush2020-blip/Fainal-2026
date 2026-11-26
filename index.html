@@ -284,6 +284,9 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 const SB_CONFIG={url:'https://dzjharsysqfchgobifdk.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6amhhcnN5c3FmY2hnb2JpZmRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxMzY4NzEsImV4cCI6MjEwMjcxMjg3MX0.73uNnmS_e1xALIRbHIMSYLMYTWYb9H7DSzteP1PKZHI'};
 const ORGS=['مدرسة رقية الإعدادية','مدرسة النهضة','مدرسة هاجر','مدرسة خولة بنت الأزور','مؤسسة حمد','مدرسة هند بنت أبي سفيان','مدرسة آمنة بنت وهب الثانوية','مدرسة الفلاح الابتدائية','مدرسة حطين','نوفر','أخرى'];
 const ORGS_WALL=ORGS.filter(o=>o!=='أخرى');
+// اسم العرض فقط؛ القيمة المحفوظة في قاعدة البيانات تبقى كما هي في ORGS
+const ORG_LABEL={'نوفر':'مستشفى نوفر'};
+const orgName=o=>ORG_LABEL[o]||o||'';
 const MAX_VIDEO=40*1024*1024, MAX_HEAD_VIDEO=80*1024*1024, MAX_REC_SEC=60;
 const sb=window.supabase.createClient(SB_CONFIG.url,SB_CONFIG.key);
 const $=id=>document.getElementById(id);
@@ -444,7 +447,7 @@ function mentorTexture(org){
     g.direction='rtl';g.textAlign='center';
     g.fillStyle='#7E1532';g.font='500 30px "Noto Kufi Arabic"';g.fillText('المشرفة الميدانية',w/2,104);
     g.fillStyle='#B8933F';g.fillRect(w/2-70,126,140,3);
-    g.fillStyle='#191417';g.font='400 34px "IBM Plex Sans Arabic"';wrapText(g,org,w/2,186,w-100,46,2);
+    g.fillStyle='#191417';g.font='400 34px "IBM Plex Sans Arabic"';wrapText(g,orgName(org),w/2,186,w-100,46,2);
     if(m){
       g.fillStyle='#7E1532';g.font='600 46px "Noto Kufi Arabic"';wrapText(g,m.mentor_name,w/2,300,w-90,58,2);
       if(m.role_title){g.fillStyle='#6A5F63';g.font='400 28px "IBM Plex Sans Arabic"';wrapText(g,m.role_title,w/2,374,w-90,38,2);}
@@ -492,28 +495,27 @@ function goToMentor(org,open){
 function openMentor(org){
   openRef=null; const m=mentorOf(org);
   sheet.classList.add('open'); sheet.setAttribute('aria-hidden','false');
-  $('shName').textContent=m?m.mentor_name:'كلمة المشرفة الميدانية'; $('shOrg').textContent=org;
+  $('shName').textContent=m?m.mentor_name:'كلمة المشرفة الميدانية'; $('shOrg').textContent=orgName(org);
   const md=$('shMedia'); md.innerHTML='';
   if(m?.photo_url){const im=new Image();im.src=m.photo_url;im.alt=m.mentor_name;im.onclick=()=>{$('zoomImg').src=m.photo_url;$('zoomOv').classList.add('show');};md.appendChild(im);}
   ['shTitleSec','shJourneySec','shHiSec','shCommentsSec','shMentorSec'].forEach(id=>$(id).hidden=true); $('composer').hidden=true;
   $('shMsgSec').hidden=false; $('shMsgSec').querySelector('h3').textContent=m?('المسمى: '+(m.role_title||'مشرفة ميدانية')):'كلمة المشرفة الميدانية';
   $('shMsg').textContent=m?m.body:'لم تُضَف كلمة المشرفة الميدانية لهذه المؤسسة بعد.';
   const act=$('shActions'); act.innerHTML=''; $('shActionsSec').hidden=false;
-  if(!m){const b=document.createElement('button');b.className='btn';b.textContent='أضيفي كلمتك';b.onclick=()=>openMentorForm(org);act.appendChild(b);}
-  else if(supPass){const b=document.createElement('button');b.className='btn ghost';b.textContent='إخفاء الكلمة';b.onclick=async()=>{if(!confirm('إخفاء كلمة المشرفة من المعرض؟'))return;const {error}=await sb.rpc('gallery_mod',{p_pass:supPass,p_kind:'mentor',p_id:m.id,p_hidden:true});if(error){toast('فشل الإخفاء',true);return;}toast('أُخفيت الكلمة');await loadMentors();refreshMentorPlaques();openMentor(org);};act.appendChild(b);}
-  else{$('shActionsSec').hidden=true;}
+  const addb=document.createElement('button'); addb.className='btn'; addb.textContent=m?'أضيفي كلمة أخرى':'أضيفي كلمتك'; addb.onclick=()=>openMentorForm(org); act.appendChild(addb);
+  if(m&&supPass){const b=document.createElement('button');b.className='btn ghost';b.textContent='إخفاء الكلمة';b.onclick=async()=>{if(!confirm('إخفاء كلمة المشرفة من المعرض؟'))return;const {error}=await sb.rpc('gallery_mod',{p_pass:supPass,p_kind:'mentor',p_id:m.id,p_hidden:true});if(error){toast('فشل الإخفاء',true);return;}toast('أُخفيت الكلمة');await loadMentors();refreshMentorPlaques();openMentor(org);};act.appendChild(b);}
 }
 let mentorFormOrg='';
 function openMentorForm(org){
   mentorFormOrg=org||'';
   $('mentorForm').reset(); $('dropMPhoto').textContent='اضغطي لاختيار صورة'; $('dropMPhoto').classList.remove('has');
   fillOrgSelect(); $('mOrg').value=mentorFormOrg||'';
-  $('mentorOrgLbl').textContent=mentorFormOrg?('مشرفات '+mentorFormOrg):'اختاري جهتك من القائمة';
+  $('mentorOrgLbl').textContent=mentorFormOrg?('مشرفات '+orgName(mentorFormOrg)):'اختاري جهتك من القائمة';
   $('mentorOv').classList.add('show');
 }
 
 function boothTextures(b,i){
-  const plate=texCanvas(1100,140,(g,w,h)=>{g.fillStyle='#8a1538';g.fillRect(0,0,w,h);g.fillStyle='#c9a24d';g.fillRect(0,h-10,w,10);g.fillStyle='#fff';g.direction='rtl';g.textAlign='right';g.font='600 54px "Noto Kufi Arabic"';g.fillText(b.student_name,w-40,62);g.font='400 36px "IBM Plex Sans Arabic"';g.fillStyle='#EBD9DE';g.fillText(b.org,w-40,116);g.textAlign='left';g.font='500 58px "Noto Kufi Arabic"';g.fillStyle='#C9A96A';g.fillText(String(i+1),40,88);});
+  const plate=texCanvas(1100,140,(g,w,h)=>{g.fillStyle='#8a1538';g.fillRect(0,0,w,h);g.fillStyle='#c9a24d';g.fillRect(0,h-10,w,10);g.fillStyle='#fff';g.direction='rtl';g.textAlign='right';g.font='600 54px "Noto Kufi Arabic"';g.fillText(b.student_name,w-40,62);g.font='400 36px "IBM Plex Sans Arabic"';g.fillStyle='#EBD9DE';g.fillText(orgName(b.org),w-40,116);g.textAlign='left';g.font='500 58px "Noto Kufi Arabic"';g.fillStyle='#C9A96A';g.fillText(String(i+1),40,88);});
   const placard=texCanvas(1024,576,(g,w,h)=>{
     if(b.video_url){
       g.fillStyle='#161214';g.fillRect(0,0,w,h);
@@ -536,7 +538,7 @@ function boothTextures(b,i){
     g.fillStyle='#8A7C80';g.font='400 26px "IBM Plex Sans Arabic"';g.textAlign='center';
     g.fillText('انقري لفتح الجناح',w/2,h-26);
   });
-  const posterFallback=texCanvas(720,1000,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#9c2247');gr.addColorStop(1,'#4a0e22');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='rgba(255,255,255,.08)';for(let k=0;k<12;k++){g.beginPath();g.arc(Math.random()*w,Math.random()*h,40+Math.random()*120,0,7);g.fill();}g.fillStyle='#c9a24d';g.fillRect(60,120,w-120,6);g.direction='rtl';g.textAlign='right';g.fillStyle='#fff';g.font='600 58px "Noto Kufi Arabic"';wrapText(g,b.title||'رحلتي التدريبية',w-60,220,w-120,74,3);g.font='400 37px "IBM Plex Sans Arabic"';g.fillStyle='#F0DEE3';wrapText(g,b.highlights||b.journey||'',w-60,470,w-120,54,6);g.font='500 40px "Noto Kufi Arabic"';g.fillStyle='#C9A96A';g.fillText(b.student_name,w-60,h-140);g.font='400 31px "IBM Plex Sans Arabic"';g.fillStyle='#f4dfe5';g.fillText(b.org,w-60,h-90);});
+  const posterFallback=texCanvas(720,1000,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#9c2247');gr.addColorStop(1,'#4a0e22');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='rgba(255,255,255,.08)';for(let k=0;k<12;k++){g.beginPath();g.arc(Math.random()*w,Math.random()*h,40+Math.random()*120,0,7);g.fill();}g.fillStyle='#c9a24d';g.fillRect(60,120,w-120,6);g.direction='rtl';g.textAlign='right';g.fillStyle='#fff';g.font='600 58px "Noto Kufi Arabic"';wrapText(g,b.title||'رحلتي التدريبية',w-60,220,w-120,74,3);g.font='400 37px "IBM Plex Sans Arabic"';g.fillStyle='#F0DEE3';wrapText(g,b.highlights||b.journey||'',w-60,470,w-120,54,6);g.font='500 40px "Noto Kufi Arabic"';g.fillStyle='#C9A96A';g.fillText(b.student_name,w-60,h-140);g.font='400 31px "IBM Plex Sans Arabic"';g.fillStyle='#f4dfe5';g.fillText(orgName(b.org),w-60,h-90);});
   return {plate,placard,posterFallback};
 }
 
@@ -618,9 +620,9 @@ let stops=[], stopIdx=0;
 function buildStops(){
   stops=[{kind:'entry',label:'مدخل المعرض',sub:(booths.length||0)+' جناح'}];
   const withWord=mentorPlaques.filter(r=>mentorOf(r.org));
-  if(withWord.length) withWord.forEach(r=>stops.push({kind:'mentor',org:r.org,label:'كلمة المشرفة الميدانية',sub:r.org}));
+  if(withWord.length) withWord.forEach(r=>stops.push({kind:'mentor',org:r.org,label:'كلمة المشرفة الميدانية',sub:orgName(r.org)}));
   else if(mentorPlaques.length) stops.push({kind:'mentor',org:mentorPlaques[0].org,label:'كلمات المشرفات الميدانيات',sub:'بانتظار الكلمات'});
-  boothObjs.forEach((r,i)=>stops.push({kind:'booth',index:i,label:r.b.student_name,sub:r.b.org}));
+  boothObjs.forEach((r,i)=>stops.push({kind:'booth',index:i,label:r.b.student_name,sub:orgName(r.b.org)}));
   stops.push({kind:'stage',label:'منصة الافتتاح',sub:'كلمة رئيس القسم'});
   stopIdx=0; updateWhere();
 }
@@ -656,7 +658,7 @@ $('navTour').onclick=()=>{
   $('navTour').style.color='var(--gold)'; run();
 };
 $('btnHead').onclick=()=>goToStage(true);
-$('btnMentors').onclick=()=>{const withWord=mentorPlaques.find(r=>mentorOf(r.org));goToMentor((withWord||mentorPlaques[0]||{}).org,false);};
+$('btnMentors').onclick=()=>{const withWord=mentorPlaques.find(r=>mentorOf(r.org));goToMentor((withWord||mentorPlaques[0]||{}).org,true);};
 
 const clock=new THREE.Clock();
 function resize(){const w=innerWidth||1,h=innerHeight||1;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
@@ -682,7 +684,7 @@ function animate(){
 let openRef=null; const sheet=$('sheet');
 function openSheet(ref){
   openRef=ref; const b=ref.b; sheet.classList.add('open'); sheet.setAttribute('aria-hidden','false');
-  $('shName').textContent=b.student_name; $('shOrg').textContent=b.org;
+  $('shName').textContent=b.student_name; $('shOrg').textContent=orgName(b.org);
   const m=$('shMedia'); m.innerHTML='';
   if(b.poster_url){const im=new Image();im.src=b.poster_url;im.alt='بوستر '+b.student_name;im.onclick=()=>{$('zoomImg').src=b.poster_url;$('zoomOv').classList.add('show');};m.appendChild(im);}
   $('shCommentsSec').hidden=false; $('shActionsSec').hidden=true; $('shMsgSec').querySelector('h3').textContent='كلمة للمؤسسة';
@@ -754,7 +756,7 @@ $('composer').onsubmit=async e=>{
 };
 
 /* ================= إضافة جناح ================= */
-$('aOrg').innerHTML='<option value="">— اختاري —</option>'+ORGS.map(o=>`<option>${o}</option>`).join('');
+$('aOrg').innerHTML='<option value="">— اختاري —</option>'+ORGS.map(o=>'<option value="'+esc(o)+'">'+esc(orgName(o))+'</option>').join('');
 const bindDrop=(dropId,inputId,label)=>{const d=$(dropId),i=$(inputId);d.onclick=()=>i.click();i.onchange=()=>{const f=i.files[0];if(!f){d.textContent=label;d.classList.remove('has');return;}d.textContent='✓ '+f.name+' ('+(f.size/1048576).toFixed(1)+' م.ب)';d.classList.add('has');};};
 bindDrop('dropPoster','aPoster','اضغطي لاختيار صورة'); bindDrop('dropVideo','aVideo','اضغطي لاختيار فيديو');
 $('btnAdd').onclick=()=>{$('addOv').classList.add('show');}; $('addCancel').onclick=()=>$('addOv').classList.remove('show');
@@ -776,7 +778,7 @@ $('addForm').onsubmit=async e=>{
 };
 
 /* ================= القائمة ================= */
-function fillList(){$('boothList').innerHTML=booths.map((b,i)=>`<button data-i="${i}"><span class="n">${i+1}</span><span class="t">${esc(b.student_name)}<small>${esc(b.org)}${b.title?' · '+esc(b.title):''}</small></span>${supPass&&!b.demo?`<span class="hide" data-hb="${b.id}" style="color:var(--danger);font-size:12px">إخفاء</span>`:''}</button>`).join('')||'<div class="empty">لا أجنحة بعد</div>';
+function fillList(){$('boothList').innerHTML=booths.map((b,i)=>`<button data-i="${i}"><span class="n">${i+1}</span><span class="t">${esc(b.student_name)}<small>${esc(orgName(b.org))}${b.title?' · '+esc(b.title):''}</small></span>${supPass&&!b.demo?`<span class="hide" data-hb="${b.id}" style="color:var(--danger);font-size:12px">إخفاء</span>`:''}</button>`).join('')||'<div class="empty">لا أجنحة بعد</div>';
   $('boothList').querySelectorAll('button').forEach(btn=>btn.onclick=async e=>{const hb=e.target.dataset.hb;if(hb){if(!confirm('إخفاء هذا الجناح من المعرض؟'))return;const {error}=await sb.rpc('gallery_mod',{p_pass:supPass,p_kind:'booth',p_id:+hb,p_hidden:true});if(error)toast('فشل',true);else{toast('أُخفي الجناح');await loadBooths();buildAll();}return;}$('listOv').classList.remove('show');goTo(+btn.dataset.i,true);});}
 $('btnList').onclick=()=>$('listOv').classList.add('show'); $('listClose').onclick=()=>$('listOv').classList.remove('show');
 
@@ -788,7 +790,7 @@ let roster={};
 async function loadRoster(){ try{ const {data}=await sb.rpc('gallery_roster_get'); roster=data?JSON.parse(data):{}; }catch(_){ roster={}; } }
 function fillOrgSelect(){
   const sel=$('mOrg');
-  sel.innerHTML='<option value="">— اختاري الجهة —</option>'+ORGS_WALL.map(o=>'<option value="'+esc(o)+'">مشرفات '+esc(o)+'</option>').join('');
+  sel.innerHTML='<option value="">— اختاري الجهة —</option>'+ORGS_WALL.map(o=>'<option value="'+esc(o)+'">مشرفات '+esc(orgName(o))+'</option>').join('');
 }
 function chosenMentorName(){
   const typed=$('mName').value.trim();

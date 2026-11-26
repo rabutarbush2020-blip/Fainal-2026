@@ -147,7 +147,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
   <button class="tbtn" id="btnList" title="قائمة الأجنحة"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span class="lbl">الأجنحة</span></button>
   <button class="tbtn primary" id="btnAdd" title="أضيفي جناحك"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">أضيفي جناحك</span></button>
   <button class="tbtn" id="btnHead" title="كلمة رئيس القسم"><svg viewBox="0 0 24 24"><path d="M21 5.5v8a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3.5V16H5.5A2.5 2.5 0 0 1 3 13.5v-8A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5z"/><path d="M9.3 7.4v3.3M14.7 7.4v3.3"/></svg><span class="lbl">كلمة رئيس القسم</span></button>
-  <button class="tbtn" id="btnMentors" title="كلمات المشرفات الميدانيات"><svg viewBox="0 0 24 24"><path d="M4 21V8l8-4 8 4v13M9 21v-6h6v6"/></svg><span class="lbl">كلمات المشرفات</span></button>
+  <button class="tbtn" id="btnMentors" title="كلمات المشرفات الميدانيات"><svg viewBox="0 0 24 24"><path d="M16.5 3h-11A2.5 2.5 0 0 0 3 5.5v6A2.5 2.5 0 0 0 5.5 14H6v3.2L9.8 14h6.7A2.5 2.5 0 0 0 19 11.5v-6A2.5 2.5 0 0 0 16.5 3z"/><path d="M19.5 8.4A2.5 2.5 0 0 1 21 10.7v5.8a2.5 2.5 0 0 1-2.5 2.5H18v2.6L14.8 19h-2.3"/></svg><span class="lbl">كلمات المشرفات</span></button>
   <button class="tbtn" id="btnEditHead" title="تحرير كلمة رئيس القسم" hidden><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/></svg></button>
   <button class="tbtn" id="btnSound" title="الصوت المحيطي" aria-pressed="false"><svg id="icSoundOff" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM17 9l4 6M21 9l-4 6"/></svg><svg id="icSoundOn" viewBox="0 0 24 24" hidden><path d="M4 9v6h4l5 4V5L8 9zM17 8a5 5 0 0 1 0 8M19.5 5.5a9 9 0 0 1 0 13"/></svg></button>
   <button class="tbtn" id="btnSup" title="دخول المشرفة الأكاديمية"><svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M21 12v2"/></svg></button>
@@ -413,7 +413,7 @@ function goToStage(openAfter){
   // تُحسب المسافة لتملأ المنصة الإطار دون إفراط في الابتعاد (مهم في شاشات الجوال الطولية)
   to.z=stage.lookAt.z+Math.max(6.5,Math.min(12.5,3.3/(Math.tan(THREE.MathUtils.degToRad(35))*aspS)*1.12));
   walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,t:0,dur:Math.min(3,0.5+from.distanceTo(to)*0.1),onDone:()=>{if(openAfter)openHead();}};
-  $('navWhere').innerHTML='منصة الافتتاح<small>كلمة رئيس القسم</small>';
+  syncStop(s=>s.kind==='stage');
 }
 function openHead(){
   openRef=null; sheet.classList.add('open'); sheet.setAttribute('aria-hidden','false');
@@ -485,7 +485,7 @@ function goToMentor(org,open){
   const dir=ref.lookAt.clone().sub(to); const yawTo=Math.atan2(-dir.x,-dir.z);
   let dy=yawTo-yaw; dy=Math.atan2(Math.sin(dy),Math.cos(dy));
   walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,t:0,dur:Math.min(2.6,0.5+from.distanceTo(to)*0.12),onDone:()=>{if(open)openMentor(org);}};
-  $('navWhere').innerHTML='كلمات المشرفات<small>'+esc(ref.org)+'</small>';
+  syncStop(s=>s.kind==='mentor'&&s.org===ref.org);
 }
 function openMentor(org){
   openRef=null; const m=mentorOf(org);
@@ -570,7 +570,7 @@ function updateBadge(ref,n){ref.b.comments=n;ref.badge.visible=n>0;drawBadge(ref
 function buildAll(){
   boothObjs.forEach(r=>{scene.remove(r.g);}); boothObjs.length=0; clickables.length=0;
   buildHall(booths.length); booths.forEach((b,i)=>buildBooth(b,i));
-  fillList(); updateWhere();
+  fillList(); buildStops();
 }
 
 /* ================= التحكم والحركة ================= */
@@ -590,6 +590,7 @@ function pick(x,y){ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCam
 let walk=null; // {from,to,yawFrom,yawTo,t,dur,onDone}
 function goTo(i,openAfter){
   const ref=boothObjs[i]; if(!ref)return; curIdx=i;
+  syncStop(s=>s.kind==='booth'&&s.index===i);
   const from=camera.position.clone(), to=ref.stand.clone();
   // مسافة الوقوف حسب عرض الشاشة: الشاشات الطولية تحتاج بُعدًا أكبر لرؤية الجناح كاملًا
   const asp=(isFinite(camera.aspect)&&camera.aspect>0)?camera.aspect:1.6;
@@ -599,12 +600,48 @@ function goTo(i,openAfter){
   const dist=from.distanceTo(to); walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,t:0,dur:Math.min(2.6,0.5+dist*0.12),onDone:()=>{if(openAfter)openSheet(ref);}};
   updateWhere();
 }
-function updateWhere(){const w=$('navWhere');if(curIdx<0||!boothObjs[curIdx]){w.innerHTML='مدخل المعرض<small>'+booths.length+' جناح</small>';return;}const b=boothObjs[curIdx].b;w.innerHTML=esc(b.student_name)+'<small>'+(curIdx+1)+' / '+booths.length+' · '+esc(b.org)+'</small>';}
-$('navNext').onclick=()=>{stopTour();goTo(Math.min(boothObjs.length-1,curIdx+1),false);};
-$('navPrev').onclick=()=>{stopTour();goTo(Math.max(0,curIdx-1),false);};
+/* --- تنقّل موحّد بين أقسام المعرض --- */
+let stops=[], stopIdx=0;
+function buildStops(){
+  stops=[{kind:'entry',label:'مدخل المعرض',sub:(booths.length||0)+' جناح'}];
+  const withWord=mentorPlaques.filter(r=>mentorOf(r.org));
+  if(withWord.length) withWord.forEach(r=>stops.push({kind:'mentor',org:r.org,label:'كلمة المشرفة الميدانية',sub:r.org}));
+  else if(mentorPlaques.length) stops.push({kind:'mentor',org:mentorPlaques[0].org,label:'كلمات المشرفات الميدانيات',sub:'بانتظار الكلمات'});
+  boothObjs.forEach((r,i)=>stops.push({kind:'booth',index:i,label:r.b.student_name,sub:r.b.org}));
+  stops.push({kind:'stage',label:'منصة الافتتاح',sub:'كلمة رئيس القسم'});
+  stopIdx=0; updateWhere();
+}
+function syncStop(pred){ const i=stops.findIndex(pred); if(i>=0){stopIdx=i;} updateWhere(); }
+function goStop(i,open){
+  if(!stops.length) return;
+  stopIdx=(i%stops.length+stops.length)%stops.length;
+  const s=stops[stopIdx];
+  if(s.kind==='entry') goEntry();
+  else if(s.kind==='mentor') goToMentor(s.org,open);
+  else if(s.kind==='booth') goTo(s.index,open);
+  else goToStage(open);
+  updateWhere();
+}
+function goEntry(){
+  stopTour(); curIdx=-1;
+  const from=camera.position.clone(), to=new THREE.Vector3(0,EYE,ENTRY_Z-2.8);
+  let dy=0-yaw; dy=Math.atan2(Math.sin(dy),Math.cos(dy));
+  walk={from,to,yawFrom:yaw,yawTo:yaw+dy,pitchFrom:pitch,t:0,dur:Math.min(3,0.6+from.distanceTo(to)*0.1),onDone:null};
+}
+function updateWhere(){
+  const w=$('navWhere'); if(!stops.length){w.innerHTML='مدخل المعرض<small>—</small>';return;}
+  const s=stops[stopIdx];
+  w.innerHTML=esc(s.label)+'<small>'+(stopIdx+1)+' / '+stops.length+' · '+esc(s.sub)+'</small>';
+}
+$('navNext').onclick=()=>{stopTour();goStop(stopIdx+1,false);};
+$('navPrev').onclick=()=>{stopTour();goStop(stopIdx-1,false);};
 let tourTimer=null;
 function stopTour(){if(tourTimer){clearTimeout(tourTimer);tourTimer=null;$('navTour').style.color='';}}
-$('navTour').onclick=()=>{if(tourTimer){stopTour();return;}$('navTour').style.color='var(--gold)';let i=curIdx;const n=boothObjs.length;const step=()=>{i=(i+1)%(n+1);if(i===n){goToStage(false);tourTimer=setTimeout(step,6000);$('navTour').style.color='var(--gold)';}else{goTo(i,false);tourTimer=setTimeout(step,5000);}};step();};
+$('navTour').onclick=()=>{
+  if(tourTimer){stopTour();return;}
+  const run=()=>{ goStop(stopIdx+1,false); $('navTour').style.color='var(--gold)'; tourTimer=setTimeout(run, stops[stopIdx]&&stops[stopIdx].kind==='stage'?6500:5200); };
+  $('navTour').style.color='var(--gold)'; run();
+};
 $('btnHead').onclick=()=>goToStage(true);
 $('btnMentors').onclick=()=>{const withWord=mentorPlaques.find(r=>mentorOf(r.org));goToMentor((withWord||mentorPlaques[0]||{}).org,false);};
 

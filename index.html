@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>المعرض الافتراضي للتدريب الميداني</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -13,7 +13,7 @@
   --maroon:#7E1532; --maroon-2:#9E2543; --gold:#B8933F; --gold-soft:#E4D5B0;
   --ink:#191417; --muted:#6A5F63; --paper:#F7F3EC; --line:#E0D7CB; --card:#FFFDFA;
   --ok:#2D6A4F; --danger:#A52A21;
-  --display:'Reem Kufi','Noto Kufi Arabic',sans-serif;
+  --display:'Noto Kufi Arabic','Noto Sans Arabic',sans-serif;
   --body:'IBM Plex Sans Arabic',system-ui,sans-serif;
   --quote:'Amiri',Georgia,serif;
   --sheet-w:430px;
@@ -39,6 +39,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 .tbtn{background:rgba(20,16,19,.72);backdrop-filter:blur(8px);color:#fff;border:1px solid rgba(255,255,255,.14);padding:9px 14px;border-radius:12px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:7px;transition:.15s}
 .tbtn:hover{background:rgba(138,21,56,.85);border-color:var(--maroon-2)}
 .tbtn.primary{background:var(--maroon);border-color:var(--maroon-2)}
+.tbtn.on{background:var(--gold);border-color:var(--gold);color:#3A2C0C}
 .tbtn.primary:hover{background:var(--maroon-2)}
 .tbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
@@ -54,9 +55,9 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 .walkpad button:active{background:var(--maroon)}
 @media (pointer:coarse){.walkpad{display:flex}}
 @media (max-width:700px){
-  #top{gap:6px;padding-inline:10px}
-  .brand{padding:6px 10px;max-width:46vw}.brand h1{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand small{display:none}
-  .tbtn{padding:8px 10px}.tbtn .lbl{display:none}
+  #top{gap:5px;padding-inline:8px}
+  .brand{padding:6px 9px;max-width:40vw;gap:7px}.brand h1{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand small{display:none}.brand .dot{width:8px;height:8px}
+  .tbtn{padding:7px 8px}.tbtn .lbl{display:none}.tbtn svg{width:17px;height:17px}
 }
 #hint{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);color:#e9dfe2;font-size:13px;background:rgba(20,16,19,.55);padding:6px 12px;border-radius:10px;z-index:19;pointer-events:none;transition:opacity .6s;white-space:nowrap}
 @media (max-width:700px){#hint{white-space:normal;text-align:center;max-width:calc(100% - 100px);left:auto;right:14px;transform:none}}
@@ -115,6 +116,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 .f textarea{min-height:70px;resize:vertical}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:480px){.grid2{grid-template-columns:1fr}}
+@media (max-width:420px){.brand{max-width:32vw}.brand h1{font-size:11.5px}.tbtn{padding:7px 6px}.tbtn svg{width:16px;height:16px}#top{gap:4px}}
 .drop{border:2px dashed var(--line);border-radius:12px;padding:12px;text-align:center;cursor:pointer;background:#fff;font-size:13px;color:var(--muted)}
 .drop.has{border-color:var(--ok);color:var(--ok)}
 .prog{height:8px;border-radius:6px;background:var(--line);overflow:hidden;display:none}
@@ -147,6 +149,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
   <button class="tbtn" id="btnHead" title="كلمة رئيس القسم"><svg viewBox="0 0 24 24"><path d="M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4 21a8 8 0 0 1 16 0"/></svg><span class="lbl">كلمة رئيس القسم</span></button>
   <button class="tbtn" id="btnMentors" title="كلمات المشرفات الميدانيات"><svg viewBox="0 0 24 24"><path d="M4 21V8l8-4 8 4v13M9 21v-6h6v6"/></svg><span class="lbl">كلمات المشرفات</span></button>
   <button class="tbtn" id="btnEditHead" title="تحرير كلمة رئيس القسم" hidden><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/></svg></button>
+  <button class="tbtn" id="btnSound" title="الصوت المحيطي" aria-pressed="false"><svg id="icSoundOff" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM17 9l4 6M21 9l-4 6"/></svg><svg id="icSoundOn" viewBox="0 0 24 24" hidden><path d="M4 9v6h4l5 4V5L8 9zM17 8a5 5 0 0 1 0 8M19.5 5.5a9 9 0 0 1 0 13"/></svg></button>
   <button class="tbtn" id="btnSup" title="دخول المشرفة الأكاديمية"><svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M21 12v2"/></svg></button>
 </div>
 <div class="sup-tag" id="supTag">وضع المشرفة</div>
@@ -309,9 +312,10 @@ const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'h
 renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.outputEncoding=THREE.sRGBEncoding; renderer.shadowMap.enabled=false;
 const scene=new THREE.Scene(); scene.background=new THREE.Color(0x1a1418); scene.fog=new THREE.Fog(0x1a1418,30,80);
 const camera=new THREE.PerspectiveCamera(70,1,0.1,200);
-const EYE=1.6; camera.position.set(0,EYE,10.4);
+const EYE=1.6; camera.position.set(0,EYE,7.9);
 let yaw=0, pitch=0; // yaw=0 ⇒ النظر نحو -z
 const HALL_W=13; let HALL_LEN=40;
+const BZ0=-4, BSTEP=6.3, ENTRY_Z=9;   // بداية الأجنحة، التباعد بينها، جدار المدخل
 const boothObjs=[]; const clickables=[]; let stands=[]; let curIdx=-1;
 
 function texCanvas(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');draw(g,w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t;}
@@ -338,8 +342,8 @@ const hallGroup=new THREE.Group(); scene.add(hallGroup);
 
 function buildHall(n){
   hallGroup.clear();
-  const rows=Math.max(1,Math.ceil(n/2)); HALL_LEN=26+rows*7.5;
-  const zc=-HALL_LEN/2+12;
+  const rows=Math.max(1,Math.ceil(n/2)); HALL_LEN=22+(rows-1)*BSTEP;
+  const zc=ENTRY_Z-HALL_LEN/2;
   const floor=new THREE.Mesh(new THREE.PlaneGeometry(HALL_W,HALL_LEN),floorMat); floor.rotation.x=-Math.PI/2; floor.position.set(0,0,zc); floorTex.repeat.set(HALL_W/2,HALL_LEN/2); hallGroup.add(floor);
   const ceil=new THREE.Mesh(new THREE.PlaneGeometry(HALL_W,HALL_LEN),ceilMat); ceil.rotation.x=Math.PI/2; ceil.position.set(0,5,zc); hallGroup.add(ceil);
   const wl=new THREE.Mesh(new THREE.PlaneGeometry(HALL_LEN,5),wallMat); wl.rotation.y=Math.PI/2; wl.position.set(-HALL_W/2,2.5,zc); hallGroup.add(wl);
@@ -356,7 +360,7 @@ function buildHall(n){
   // سجادة الممر
   const carpet=new THREE.Mesh(new THREE.PlaneGeometry(3.2,HALL_LEN-2),new THREE.MeshStandardMaterial({color:col(0x6e1230),roughness:1})); carpet.rotation.x=-Math.PI/2; carpet.position.set(0,0.01,zc); hallGroup.add(carpet);
   // لوحة المدخل
-  const banner=new THREE.Mesh(new THREE.PlaneGeometry(9,2.2),new THREE.MeshBasicMaterial({map:texCanvas(1800,440,(g,w,h)=>{g.fillStyle='#8a1538';g.fillRect(0,0,w,h);g.fillStyle='#c9a24d';g.fillRect(0,h-18,w,18);g.fillStyle='#fff';g.textAlign='center';g.direction='rtl';g.font='600 92px "Reem Kufi"';g.fillText('المعرض الافتراضي للتدريب الميداني',w/2,175);g.font='400 50px "IBM Plex Sans Arabic"';g.fillStyle='#f4dfe5';g.fillText('رحلات الطالبات في المؤسسات التدريبية · أهلًا بكم',w/2,300);})})); banner.position.set(0,3.6,zc-HALL_LEN/2+0.05); hallGroup.add(banner);
+  const banner=new THREE.Mesh(new THREE.PlaneGeometry(9,2.2),new THREE.MeshBasicMaterial({map:texCanvas(1800,440,(g,w,h)=>{g.fillStyle='#8a1538';g.fillRect(0,0,w,h);g.fillStyle='#c9a24d';g.fillRect(0,h-18,w,18);g.fillStyle='#fff';g.textAlign='center';g.direction='rtl';g.font='600 92px "Noto Kufi Arabic"';g.fillText('المعرض الافتراضي للتدريب الميداني',w/2,175);g.font='400 50px "IBM Plex Sans Arabic"';g.fillStyle='#f4dfe5';g.fillText('رحلات الطالبات في المؤسسات التدريبية · أهلًا بكم',w/2,300);})})); banner.position.set(0,3.6,zc-HALL_LEN/2+0.05); hallGroup.add(banner);
   // كلمات المشرفات الميدانيات (عند المدخل، قبل الأجنحة)
   buildMentorWall();
   // منصة كلمة رئيس القسم (في صدر القاعة)
@@ -365,13 +369,13 @@ function buildHall(n){
   hallGroup.add(new THREE.HemisphereLight(0xfff4e6,0x3a2a30,.75));
   const amb=new THREE.AmbientLight(0xffffff,.25); hallGroup.add(amb);
   // إنارة مدخل المعرض
-  for(const z of[10.2,5.4,0.6]){const p=new THREE.PointLight(0xfff0dc,.85,20,1.6);p.position.set(0,4.6,z);hallGroup.add(p);
+  for(const z of[7.6,3.2,-0.8]){const p=new THREE.PointLight(0xfff0dc,.85,20,1.6);p.position.set(0,4.6,z);hallGroup.add(p);
     const lamp=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.5),new THREE.MeshBasicMaterial({color:0xfff5e6}));lamp.position.set(0,4.95,z);hallGroup.add(lamp);
     for(const s of[-1,1]){const wash=new THREE.PointLight(0xfff4e4,.5,7,1.5);wash.position.set(s*(HALL_W/2-1.1),3.5,z);hallGroup.add(wash);}}
-  for(let i=0;i<=rows;i++){const p=new THREE.PointLight(0xfff0dc,.9,22,1.6);p.position.set(0,4.6,-2-i*7.5);hallGroup.add(p);
+  for(let i=0;i<=rows;i++){const p=new THREE.PointLight(0xfff0dc,.9,22,1.6);p.position.set(0,4.6,BZ0+1.5-i*BSTEP);hallGroup.add(p);
     const lamp=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,0.5),new THREE.MeshBasicMaterial({color:0xfff5e6}));lamp.position.copy(p.position);lamp.position.y=4.95;hallGroup.add(lamp);}
   // أعمدة حبل
-  for(let i=0;i<=rows*2;i++){for(const s of[-1,1]){const post=new THREE.Mesh(new THREE.CylinderGeometry(.04,.05,.9,12),goldMat);post.position.set(s*2.2,.45,-3-i*3.75);hallGroup.add(post);}}
+  for(let i=0;i<=rows*2;i++){for(const s of[-1,1]){const post=new THREE.Mesh(new THREE.CylinderGeometry(.04,.05,.9,12),goldMat);post.position.set(s*2.2,.45,BZ0+1-i*(BSTEP/2));hallGroup.add(post);}}
 }
 
 /* --- منصة كلمة رئيس القسم --- */
@@ -381,8 +385,8 @@ function stageTexture(){
   return texCanvas(1600,900,(g,w,h)=>{
     const gr=g.createLinearGradient(0,0,w,h);gr.addColorStop(0,'#5a0c24');gr.addColorStop(1,'#1c0810');g.fillStyle=gr;g.fillRect(0,0,w,h);
     g.fillStyle='#c9a24d';g.fillRect(0,0,w,14);g.fillRect(0,h-14,w,14);
-    g.direction='rtl';g.textAlign='center';g.fillStyle='#c9a24d';g.font='500 46px "Reem Kufi"';g.fillText('كلمة الافتتاح',w/2,150);
-    g.fillStyle='#fff';g.font='600 104px "Reem Kufi"';g.fillText(head?.name||'كلمة رئيس القسم',w/2,330);
+    g.direction='rtl';g.textAlign='center';g.fillStyle='#c9a24d';g.font='500 46px "Noto Kufi Arabic"';g.fillText('كلمة الافتتاح',w/2,150);
+    g.fillStyle='#fff';g.font='600 104px "Noto Kufi Arabic"';g.fillText(head?.name||'كلمة رئيس القسم',w/2,330);
     g.fillStyle='#f4dfe5';g.font='400 54px "IBM Plex Sans Arabic"';g.fillText(head?.title||'قسم العلوم الاجتماعية · جامعة قطر',w/2,430);
     if(head&&(head.video_url||head.text)){g.fillStyle='#8a1538';g.beginPath();g.arc(w/2,640,80,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.moveTo(w/2-26,596);g.lineTo(w/2+44,640);g.lineTo(w/2-26,684);g.fill();g.font='500 42px "IBM Plex Sans Arabic"';g.fillText('انقري للاستماع إلى الكلمة',w/2,800);}
     else{g.fillStyle='#d8cdd1';g.font='400 44px "IBM Plex Sans Arabic"';g.fillText('ستُعرض الكلمة هنا قريبًا',w/2,660);}
@@ -397,7 +401,6 @@ function buildStage(farZ){
   const screen=new THREE.Mesh(new THREE.PlaneGeometry(6.1,3.43),screenMat); screen.position.set(0,2.35,farZ+0.47); g.add(screen);
   const podium=new THREE.Mesh(new THREE.BoxGeometry(0.9,1.15,0.6),accentMat); podium.position.set(-3.2,0.98,farZ+3.0); g.add(podium);
   const podTop=new THREE.Mesh(new THREE.BoxGeometry(1.0,0.06,0.7),goldMat); podTop.position.set(-3.2,1.58,farZ+3.0); g.add(podTop);
-  for(const s of[-1,1]){const pot=new THREE.Mesh(new THREE.CylinderGeometry(.3,.22,.6,14),goldMat);pot.position.set(s*4.4,.7,farZ+2.8);g.add(pot);const plant=new THREE.Mesh(new THREE.SphereGeometry(.55,12,10),new THREE.MeshStandardMaterial({color:col(0x2f5e3a),roughness:1}));plant.position.set(s*4.4,1.4,farZ+2.8);g.add(plant);}
   const spot=new THREE.PointLight(0xfff2e0,1.1,10,1.4); spot.position.set(0,4.4,farZ+3); g.add(spot);
   hallGroup.add(g);
   stage={screenMat,stand:new THREE.Vector3(0,EYE,farZ+9.5),lookAt:new THREE.Vector3(0,2.2,farZ)};
@@ -435,11 +438,11 @@ function mentorTexture(org){
     g.fillStyle=m?'#FBF7F0':'#EFE9E0';g.fillRect(0,0,w,h);
     g.strokeStyle='#B8933F';g.lineWidth=5;g.strokeRect(22,22,w-44,h-44);
     g.direction='rtl';g.textAlign='center';
-    g.fillStyle='#7E1532';g.font='500 30px "Reem Kufi"';g.fillText('المشرفة الميدانية',w/2,104);
+    g.fillStyle='#7E1532';g.font='500 30px "Noto Kufi Arabic"';g.fillText('المشرفة الميدانية',w/2,104);
     g.fillStyle='#B8933F';g.fillRect(w/2-70,126,140,3);
     g.fillStyle='#191417';g.font='400 34px "IBM Plex Sans Arabic"';wrapText(g,org,w/2,186,w-100,46,2);
     if(m){
-      g.fillStyle='#7E1532';g.font='600 46px "Reem Kufi"';wrapText(g,m.mentor_name,w/2,300,w-90,58,2);
+      g.fillStyle='#7E1532';g.font='600 46px "Noto Kufi Arabic"';wrapText(g,m.mentor_name,w/2,300,w-90,58,2);
       if(m.role_title){g.fillStyle='#6A5F63';g.font='400 28px "IBM Plex Sans Arabic"';wrapText(g,m.role_title,w/2,374,w-90,38,2);}
       g.fillStyle='#2B2226';g.font='400 30px Amiri';g.textAlign='right';
       wrapText(g,'«'+m.body+'»',w-58,452,w-116,47,7);
@@ -447,13 +450,13 @@ function mentorTexture(org){
     }else{
       g.fillStyle='#9A8E92';g.font='400 30px "IBM Plex Sans Arabic"';wrapText(g,'بانتظار كلمة المشرفة الميدانية',w/2,330,w-90,44,2);
       g.strokeStyle='#B8933F';g.lineWidth=2;g.setLineDash([9,7]);g.strokeRect(70,400,w-140,110);g.setLineDash([]);
-      g.fillStyle='#7E1532';g.font='500 31px "Reem Kufi"';g.fillText('انقري لإضافة كلمتك',w/2,468);
+      g.fillStyle='#7E1532';g.font='500 31px "Noto Kufi Arabic"';g.fillText('انقري لإضافة كلمتك',w/2,468);
     }
   });
 }
 function buildMentorWall(){
   mentorPlaques.length=0;
-  const zStart=9.2, step=2.3, per=Math.ceil(ORGS_WALL.length/2);
+  const zStart=7.0, step=1.72, per=Math.ceil(ORGS_WALL.length/2);
   ORGS_WALL.forEach((org,i)=>{
     const side=(i%2===0)?1:-1, k=Math.floor(i/2);
     const x=side*(HALL_W/2-0.06), z=zStart-k*step;
@@ -469,8 +472,8 @@ function buildMentorWall(){
   });
   // لافتة القسم على الجدارين
   for(const s of[-1,1]){
-    const sign=new THREE.Mesh(new THREE.PlaneGeometry(3.4,0.62),new THREE.MeshBasicMaterial({map:texCanvas(1360,248,(g,w,h)=>{g.fillStyle='#7E1532';g.fillRect(0,0,w,h);g.fillStyle='#B8933F';g.fillRect(0,h-9,w,9);g.fillStyle='#fff';g.direction='rtl';g.textAlign='center';g.font='500 76px "Reem Kufi"';g.fillText('كلمات المشرفات الميدانيات',w/2,112);g.font='400 40px "IBM Plex Sans Arabic"';g.fillStyle='#EBD9DE';g.fillText('كلمة كل مؤسسة في شريكاتها من الطالبات',w/2,180);})}));
-    sign.position.set(s*(HALL_W/2-0.05),3.72,zStart+2.1); sign.rotation.y=-s*Math.PI/2; hallGroup.add(sign);
+    const sign=new THREE.Mesh(new THREE.PlaneGeometry(3.4,0.62),new THREE.MeshBasicMaterial({map:texCanvas(1360,248,(g,w,h)=>{g.fillStyle='#7E1532';g.fillRect(0,0,w,h);g.fillStyle='#B8933F';g.fillRect(0,h-9,w,9);g.fillStyle='#fff';g.direction='rtl';g.textAlign='center';g.font='500 76px "Noto Kufi Arabic"';g.fillText('كلمات المشرفات الميدانيات',w/2,112);g.font='400 40px "IBM Plex Sans Arabic"';g.fillStyle='#EBD9DE';g.fillText('كلمة كل مؤسسة في شريكاتها من الطالبات',w/2,180);})}));
+    sign.position.set(s*(HALL_W/2-0.05),3.72,zStart+1.55); sign.rotation.y=-s*Math.PI/2; hallGroup.add(sign);
   }
 }
 function refreshMentorPlaques(){mentorPlaques.forEach(r=>{r.mat.map=mentorTexture(r.org);r.mat.needsUpdate=true;});}
@@ -500,7 +503,7 @@ let mentorFormOrg='';
 function openMentorForm(org){mentorFormOrg=org;$('mentorOrgLbl').textContent=org;$('mentorForm').reset();$('dropMPhoto').textContent='اضغطي لاختيار صورة';$('dropMPhoto').classList.remove('has');$('mentorOv').classList.add('show');$('mName').focus();}
 
 function boothTextures(b,i){
-  const plate=texCanvas(1100,140,(g,w,h)=>{g.fillStyle='#8a1538';g.fillRect(0,0,w,h);g.fillStyle='#c9a24d';g.fillRect(0,h-10,w,10);g.fillStyle='#fff';g.direction='rtl';g.textAlign='right';g.font='600 54px "Reem Kufi"';g.fillText(b.student_name,w-40,62);g.font='400 36px "IBM Plex Sans Arabic"';g.fillStyle='#EBD9DE';g.fillText(b.org,w-40,116);g.textAlign='left';g.font='500 58px "Reem Kufi"';g.fillStyle='#C9A96A';g.fillText(String(i+1),40,88);});
+  const plate=texCanvas(1100,140,(g,w,h)=>{g.fillStyle='#8a1538';g.fillRect(0,0,w,h);g.fillStyle='#c9a24d';g.fillRect(0,h-10,w,10);g.fillStyle='#fff';g.direction='rtl';g.textAlign='right';g.font='600 54px "Noto Kufi Arabic"';g.fillText(b.student_name,w-40,62);g.font='400 36px "IBM Plex Sans Arabic"';g.fillStyle='#EBD9DE';g.fillText(b.org,w-40,116);g.textAlign='left';g.font='500 58px "Noto Kufi Arabic"';g.fillStyle='#C9A96A';g.fillText(String(i+1),40,88);});
   const placard=texCanvas(1024,576,(g,w,h)=>{
     if(b.video_url){
       g.fillStyle='#161214';g.fillRect(0,0,w,h);
@@ -514,7 +517,7 @@ function boothTextures(b,i){
     g.fillStyle='#F7F3EC';g.fillRect(0,0,w,h);
     g.fillStyle='#B8933F';g.fillRect(0,0,w,9);
     g.direction='rtl';g.textAlign='right';
-    g.fillStyle='#7E1532';g.font='500 40px "Reem Kufi"';
+    g.fillStyle='#7E1532';g.font='500 40px "Noto Kufi Arabic"';
     g.fillText(b.title||'أبرز الأنشطة',w-52,88);
     g.strokeStyle='#E0D7CB';g.lineWidth=2;g.beginPath();g.moveTo(52,118);g.lineTo(w-52,118);g.stroke();
     const lines=String(b.highlights||b.journey||'').split('\n').map(t=>t.trim()).filter(Boolean).slice(0,7);
@@ -523,7 +526,7 @@ function boothTextures(b,i){
     g.fillStyle='#8A7C80';g.font='400 26px "IBM Plex Sans Arabic"';g.textAlign='center';
     g.fillText('انقري لفتح الجناح',w/2,h-26);
   });
-  const posterFallback=texCanvas(720,1000,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#9c2247');gr.addColorStop(1,'#4a0e22');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='rgba(255,255,255,.08)';for(let k=0;k<12;k++){g.beginPath();g.arc(Math.random()*w,Math.random()*h,40+Math.random()*120,0,7);g.fill();}g.fillStyle='#c9a24d';g.fillRect(60,120,w-120,6);g.direction='rtl';g.textAlign='right';g.fillStyle='#fff';g.font='600 58px "Reem Kufi"';wrapText(g,b.title||'رحلتي التدريبية',w-60,220,w-120,74,3);g.font='400 37px "IBM Plex Sans Arabic"';g.fillStyle='#F0DEE3';wrapText(g,b.highlights||b.journey||'',w-60,470,w-120,54,6);g.font='500 40px "Reem Kufi"';g.fillStyle='#C9A96A';g.fillText(b.student_name,w-60,h-140);g.font='400 31px "IBM Plex Sans Arabic"';g.fillStyle='#f4dfe5';g.fillText(b.org,w-60,h-90);});
+  const posterFallback=texCanvas(720,1000,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#9c2247');gr.addColorStop(1,'#4a0e22');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='rgba(255,255,255,.08)';for(let k=0;k<12;k++){g.beginPath();g.arc(Math.random()*w,Math.random()*h,40+Math.random()*120,0,7);g.fill();}g.fillStyle='#c9a24d';g.fillRect(60,120,w-120,6);g.direction='rtl';g.textAlign='right';g.fillStyle='#fff';g.font='600 58px "Noto Kufi Arabic"';wrapText(g,b.title||'رحلتي التدريبية',w-60,220,w-120,74,3);g.font='400 37px "IBM Plex Sans Arabic"';g.fillStyle='#F0DEE3';wrapText(g,b.highlights||b.journey||'',w-60,470,w-120,54,6);g.font='500 40px "Noto Kufi Arabic"';g.fillStyle='#C9A96A';g.fillText(b.student_name,w-60,h-140);g.font='400 31px "IBM Plex Sans Arabic"';g.fillStyle='#f4dfe5';g.fillText(b.org,w-60,h-90);});
   return {plate,placard,posterFallback};
 }
 
@@ -549,7 +552,7 @@ function buildBooth(b,i){
   const spot=new THREE.PointLight(0xfff2e0,.6,7,1.5); spot.position.set(0,3.6,1.5); g.add(spot);
   // الموضع
   const sideSign=(i%2===0)?-1:1, row=Math.floor(i/2);
-  const z=-6-row*7.5; g.position.set(sideSign*(HALL_W/2-0.1),0,z); g.rotation.y=-sideSign*Math.PI/2;
+  const z=BZ0-row*BSTEP; g.position.set(sideSign*(HALL_W/2-0.1),0,z); g.rotation.y=-sideSign*Math.PI/2;
   scene.add(g);
   const ref={b,g,screen,screenMat,placard:t.placard,poster,badge,badgeTex,video:null,stand:new THREE.Vector3(sideSign*2.6,EYE,z),lookAt:new THREE.Vector3(sideSign*(HALL_W/2),1.9,z),index:i};
   [panel,poster,screen,pf,sf,ped,plate].forEach(m=>{m.userData.booth=ref;clickables.push(m);});
@@ -559,7 +562,7 @@ function drawBadge(g,n){g.clearRect(0,0,256,256);
   g.fillStyle='rgba(126,21,50,.93)';g.beginPath();g.arc(128,112,74,0,7);g.fill();
   g.strokeStyle='#C9A96A';g.lineWidth=5;g.beginPath();g.arc(128,112,74,0,7);g.stroke();
   g.beginPath();g.moveTo(104,172);g.lineTo(128,208);g.lineTo(146,176);g.fillStyle='rgba(126,21,50,.93)';g.fill();
-  g.fillStyle='#fff';g.font='600 62px "Reem Kufi"';g.textAlign='center';g.fillText(String(n),128,136);}
+  g.fillStyle='#fff';g.font='600 62px "Noto Kufi Arabic"';g.textAlign='center';g.fillText(String(n),128,136);}
 function updateBadge(ref,n){ref.b.comments=n;ref.badge.visible=n>0;drawBadge(ref.badgeTex.image.getContext('2d'),n);ref.badgeTex.needsUpdate=true;}
 
 function buildAll(){
@@ -765,11 +768,59 @@ $('btnSup').onclick=()=>{if(supPass){if(confirm('الخروج من وضع الم
 $('supCancel').onclick=()=>$('supOv').classList.remove('show');
 $('supForm').onsubmit=async e=>{e.preventDefault();const p=$('supPass').value;const {error}=await sb.rpc('gallery_mod',{p_pass:p,p_kind:'booth',p_id:0,p_hidden:false});if(error){toast('كلمة السر غير صحيحة',true);return;}supPass=p;store.set('galSup',p,true);$('supOv').classList.remove('show');$('supPass').value='';applySup();toast('مرحبًا بالمشرفة');};
 
+/* ================= صوت محيطي لطيف (مُطفأ افتراضيًا) ================= */
+let actx=null, ambMaster=null, bellTimer=null, soundOn=false;
+function buildAmbient(){
+  const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
+  actx=new AC();
+  ambMaster=actx.createGain(); ambMaster.gain.value=0.0001; ambMaster.connect(actx.destination);
+  const filt=actx.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=820; filt.Q.value=0.6; filt.connect(ambMaster);
+  [130.81,196.00,261.63].forEach((f,i)=>{
+    const o=actx.createOscillator(); o.type='sine'; o.frequency.value=f*(i===1?1.003:1);
+    const g=actx.createGain(); g.gain.value=(i===2?0.16:0.32);
+    o.connect(g); g.connect(filt); o.start();
+  });
+  const scale=[523.25,587.33,659.25,783.99,880.00];
+  const bell=()=>{
+    if(!soundOn||!actx) return;
+    const t=actx.currentTime, o=actx.createOscillator(), g=actx.createGain();
+    o.type='sine'; o.frequency.value=scale[(Math.random()*scale.length)|0];
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.042,t+0.04); g.gain.exponentialRampToValueAtTime(0.0001,t+3.4);
+    o.connect(g); g.connect(ambMaster); o.start(t); o.stop(t+3.5);
+    bellTimer=setTimeout(bell, 8000+Math.random()*10000);
+  };
+  bellTimer=setTimeout(bell,4500);
+  return true;
+}
+function setSound(on){
+  soundOn=on;
+  const btn=$('btnSound'); btn.setAttribute('aria-pressed',on?'true':'false'); btn.classList.toggle('on',on);
+  $('icSoundOn').hidden=!on; $('icSoundOff').hidden=on;
+  store.set('galSound',on?'1':'0');
+  if(on){
+    if(!actx && !buildAmbient()){ toast('المتصفح لا يدعم الصوت',true); soundOn=false; return; }
+    if(actx.resume) actx.resume();
+    ambMaster.gain.setTargetAtTime(0.07, actx.currentTime, 1.6);
+  }else if(actx){
+    ambMaster.gain.setTargetAtTime(0.0001, actx.currentTime, 0.5);
+    clearTimeout(bellTimer);
+  }
+}
+$('btnSound').onclick=()=>setSound(!soundOn);
+
 /* ================= البداية ================= */
 (async()=>{
-  try{await Promise.all(['600 40px "Reem Kufi"','500 40px "Reem Kufi"','700 30px "IBM Plex Sans Arabic"','400 30px "IBM Plex Sans Arabic"','400 30px Amiri'].map(f=>document.fonts.load(f)));}catch(_){}
+  try{await Promise.all(['600 40px "Noto Kufi Arabic"','500 40px "Noto Kufi Arabic"','700 30px "IBM Plex Sans Arabic"','400 30px "IBM Plex Sans Arabic"','400 30px Amiri'].map(f=>document.fonts.load(f)));}catch(_){}
   await Promise.all([loadBooths(),loadHead(),loadMentors()]); buildAll(); applySup(); animate();
   document.fonts.ready.then(()=>{refreshStage();});
+  // حركة دخول: انزلاق هادئ من أعلى المدخل إلى مستوى النظر
+  camera.position.set(0,3.4,8.7); pitch=-0.28; yaw=0;
+  walk={from:camera.position.clone(),to:new THREE.Vector3(0,EYE,6.2),yawFrom:0,yawTo:0,pitchFrom:-0.28,t:0,dur:4.5,onDone:null};
+  // الصوت لا يبدأ تلقائيًا (سياسة المتصفحات) — يُستأنف عند أول لمسة إن كان مُفعَّلًا سابقًا
+  if(store.get('galSound')==='1'){
+    const once=()=>{ setSound(true); };
+    addEventListener('pointerdown',once,{once:true}); addEventListener('keydown',once,{once:true});
+  }
   // بطاقة ترحيب تقود إلى كلمة رئيس القسم (مرة واحدة في الجلسة)
   if(head&&(head.video_url||head.text)&&!store.get('galWelcomed',true)){
     $('wHead').textContent=head.name?('كلمة '+head.name):'كلمة رئيس القسم'; if(head.title)$('wSub').textContent=head.title+' — نرحّب بكم في المعرض الافتراضي للتدريب الميداني';

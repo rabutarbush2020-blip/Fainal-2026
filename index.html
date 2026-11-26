@@ -392,14 +392,47 @@ function buildHall(n){
 let head=null; // {name,title,text,video_url,photo_url}
 let stage=null; // {screenMat, stand, lookAt}
 function stageTexture(){
+  const img=head&&head.photo_url?mentorImgs[head.photo_url]:null;
   return texCanvas(1600,900,(g,w,h)=>{
-    const gr=g.createLinearGradient(0,0,w,h);gr.addColorStop(0,'#5a0c24');gr.addColorStop(1,'#1c0810');g.fillStyle=gr;g.fillRect(0,0,w,h);
-    g.fillStyle='#c9a24d';g.fillRect(0,0,w,14);g.fillRect(0,h-14,w,14);
-    g.direction='rtl';g.textAlign='center';g.fillStyle='#c9a24d';g.font='500 46px "Noto Kufi Arabic"';g.fillText('كلمة الافتتاح',w/2,150);
-    g.fillStyle='#fff';g.font='600 104px "Noto Kufi Arabic"';g.fillText(head?.name||'كلمة رئيس القسم',w/2,330);
-    g.fillStyle='#f4dfe5';g.font='400 54px "IBM Plex Sans Arabic"';g.fillText(head?.title||'قسم العلوم الاجتماعية · جامعة قطر',w/2,430);
-    if(head&&(head.video_url||head.text)){g.fillStyle='#8a1538';g.beginPath();g.arc(w/2,640,80,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.moveTo(w/2-26,596);g.lineTo(w/2+44,640);g.lineTo(w/2-26,684);g.fill();g.font='500 42px "IBM Plex Sans Arabic"';g.fillText('انقري للاستماع إلى الكلمة',w/2,800);}
-    else{g.fillStyle='#d8cdd1';g.font='400 44px "IBM Plex Sans Arabic"';g.fillText('ستُعرض الكلمة هنا قريبًا',w/2,660);}
+    if(img){
+      const ar=img.width/img.height, car=w/h;
+      let sw=img.width, sh=img.height, sx=0, sy=0;
+      if(ar>car){ sw=img.height*car; sx=(img.width-sw)/2; } else { sh=img.width/car; sy=(img.height-sh)/2; }
+      g.drawImage(img,sx,sy,sw,sh,0,0,w,h);
+      const sc=g.createLinearGradient(w,0,0,0);
+      sc.addColorStop(0,'rgba(12,8,10,.35)'); sc.addColorStop(0.55,'rgba(12,8,10,.88)'); sc.addColorStop(1,'rgba(12,8,10,.96)');
+      g.fillStyle=sc; g.fillRect(0,0,w,h);
+    }else{
+      const gr=g.createLinearGradient(0,0,w,h); gr.addColorStop(0,'#5E1030'); gr.addColorStop(1,'#140810');
+      g.fillStyle=gr; g.fillRect(0,0,w,h);
+      g.fillStyle='rgba(201,169,106,.10)'; g.beginPath(); g.arc(w*0.18,h*0.30,330,0,7); g.fill();
+    }
+    g.fillStyle='#C9A96A'; g.fillRect(0,0,w,8);
+    g.direction='rtl'; g.textAlign='right';
+    const R=w-90;
+    g.font='500 36px "Noto Kufi Arabic"';
+    const badge='كلمة الافتتاح', bw=g.measureText(badge).width+64;
+    g.fillStyle='rgba(255,255,255,.13)'; rrect(g,R-bw,86,bw,66,33); g.fill();
+    g.strokeStyle='rgba(255,255,255,.34)'; g.lineWidth=2; g.stroke();
+    g.fillStyle='#fff'; g.fillText(badge,R-32,131);
+
+    g.fillStyle='#fff'; g.font='600 104px "Noto Kufi Arabic"';
+    wrapText(g, (head&&head.name)?head.name:'كلمة رئيس القسم', R, 300, w-180, 124, 2);
+    g.fillStyle='#C9A96A'; g.fillRect(R-120,392,120,5);
+    g.fillStyle='#EADFE3'; g.font='400 46px "IBM Plex Sans Arabic"';
+    g.fillText((head&&head.title)?head.title:'قسم العلوم الاجتماعية · جامعة قطر', R, 470);
+
+    if(head&&(head.video_url||head.text)){
+      g.font='500 38px "Noto Kufi Arabic"';
+      const cta=head.video_url?'انقري لمشاهدة الكلمة':'انقري لقراءة الكلمة', cw=g.measureText(cta).width+112;
+      g.fillStyle='rgba(201,169,106,.22)'; rrect(g,R-cw,560,cw,78,39); g.fill();
+      g.strokeStyle='rgba(201,169,106,.78)'; g.lineWidth=2.4; g.stroke();
+      g.fillStyle='#E9D9B4'; g.fillText(cta,R-82,608);
+      g.beginPath(); g.moveTo(R-cw+30,580); g.lineTo(R-cw+62,599); g.lineTo(R-cw+30,618); g.fill();
+    }else{
+      g.fillStyle='#A99DA2'; g.font='400 40px "IBM Plex Sans Arabic"';
+      g.fillText('سَتُعرض الكلمة هنا قريبًا', R, 596);
+    }
   });
 }
 function buildStage(farZ){
@@ -441,31 +474,73 @@ function openHead(){
   if(supPass){$('shActionsSec').hidden=false;const hb=document.createElement('button');hb.className='btn';hb.textContent=(head&&(head.text||head.video_url))?'تعديل الكلمة':'أضيفي كلمة رئيس القسم';hb.onclick=()=>$('btnEditHead').click();hact.appendChild(hb);}
   else $('shActionsSec').hidden=true;
 }
-async function loadHead(){try{const {data}=await sb.rpc('gallery_head_get');head=data?JSON.parse(data):null;}catch(_){head=null;}}
+async function loadHead(){
+  try{const {data}=await sb.rpc('gallery_head_get');head=data?JSON.parse(data):null;}catch(_){head=null;}
+  if(head&&head.photo_url&&!mentorImgs[head.photo_url]){
+    await new Promise(res=>{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>{mentorImgs[head.photo_url]=im;res();};im.onerror=()=>res();im.src=head.photo_url;});
+  }
+}
 
 /* --- كلمات المشرفات الميدانيات --- */
-let mentors=[]; const mentorPlaques=[];
+let mentors=[]; const mentorPlaques=[]; const mentorImgs={};
 const mentorOf=o=>mentors.find(m=>m.org===o)||null;
-async function loadMentors(){try{const {data,error}=await sb.rpc('gallery_mentors_list');if(error)throw error;mentors=data||[];}catch(_){mentors=[];}}
+async function loadMentors(){
+  try{const {data,error}=await sb.rpc('gallery_mentors_list');if(error)throw error;mentors=data||[];}catch(_){mentors=[];}
+  await Promise.all(mentors.filter(m=>m.photo_url&&!mentorImgs[m.photo_url]).map(m=>new Promise(res=>{
+    const im=new Image(); im.crossOrigin='anonymous';
+    im.onload=()=>{mentorImgs[m.photo_url]=im;res();}; im.onerror=()=>res(); im.src=m.photo_url;
+  })));
+}
 function mentorTexture(org){
   const m=mentorOf(org);
+  const img=m&&m.photo_url?mentorImgs[m.photo_url]:null;
   return texCanvas(640,880,(g,w,h)=>{
-    g.fillStyle=m?'#FBF7F0':'#EFE9E0';g.fillRect(0,0,w,h);
-    g.strokeStyle='#B8933F';g.lineWidth=5;g.strokeRect(22,22,w-44,h-44);
-    g.direction='rtl';g.textAlign='center';
-    g.fillStyle='#7E1532';g.font='500 30px "Noto Kufi Arabic"';g.fillText('المشرفة الميدانية',w/2,104);
-    g.fillStyle='#B8933F';g.fillRect(w/2-70,126,140,3);
-    g.fillStyle='#191417';g.font='400 34px "IBM Plex Sans Arabic"';wrapText(g,orgName(org),w/2,186,w-100,46,2);
-    if(m){
-      g.fillStyle='#7E1532';g.font='600 46px "Noto Kufi Arabic"';wrapText(g,m.mentor_name,w/2,300,w-90,58,2);
-      if(m.role_title){g.fillStyle='#6A5F63';g.font='400 28px "IBM Plex Sans Arabic"';wrapText(g,m.role_title,w/2,374,w-90,38,2);}
-      g.fillStyle='#2B2226';g.font='400 30px Amiri';g.textAlign='right';
-      wrapText(g,'«'+m.body+'»',w-58,452,w-116,47,7);
-      g.textAlign='center';g.fillStyle='#8A7C80';g.font='400 25px "IBM Plex Sans Arabic"';g.fillText('انقري لقراءة الكلمة كاملة',w/2,h-62);
+    // خلفية: صورة المشرفة إن وُجدت، وإلا سطح داكن بلمسة عنّابية
+    if(img){
+      const ar=img.width/img.height, car=w/h;
+      let sw=img.width, sh=img.height, sx=0, sy=0;
+      if(ar>car){ sw=img.height*car; sx=(img.width-sw)/2; } else { sh=img.width/car; sy=(img.height-sh)/2; }
+      g.drawImage(img,sx,sy,sw,sh,0,0,w,h);
     }else{
-      g.fillStyle='#9A8E92';g.font='400 30px "IBM Plex Sans Arabic"';wrapText(g,'بانتظار كلمة المشرفة الميدانية',w/2,330,w-90,44,2);
-      g.strokeStyle='#B8933F';g.lineWidth=2;g.setLineDash([9,7]);g.strokeRect(70,400,w-140,110);g.setLineDash([]);
-      g.fillStyle='#7E1532';g.font='500 31px "Noto Kufi Arabic"';g.fillText('انقري لإضافة كلمتك',w/2,468);
+      const gr=g.createLinearGradient(0,0,w,h);
+      gr.addColorStop(0, m?'#2A1A21':'#211A1E'); gr.addColorStop(1, m?'#140C10':'#171215');
+      g.fillStyle=gr; g.fillRect(0,0,w,h);
+      g.fillStyle='rgba(126,21,50,.30)'; g.beginPath(); g.arc(w*0.82,h*0.18,190,0,7); g.fill();
+    }
+    const scrim=g.createLinearGradient(0,h*0.18,0,h);
+    scrim.addColorStop(0,'rgba(12,8,10,.25)'); scrim.addColorStop(0.5,'rgba(12,8,10,.80)'); scrim.addColorStop(1,'rgba(12,8,10,.96)');
+    g.fillStyle=scrim; g.fillRect(0,0,w,h);
+    g.strokeStyle='rgba(201,169,106,.55)'; g.lineWidth=3; g.strokeRect(16,16,w-32,h-32);
+
+    g.direction='rtl'; g.textAlign='right';
+    // شارة علوية
+    g.font='500 25px "Noto Kufi Arabic"';
+    const badge='المشرفة الميدانية', bw=g.measureText(badge).width+44;
+    g.fillStyle='rgba(255,255,255,.13)'; rrect(g,w-42-bw,42,bw,50,25); g.fill();
+    g.strokeStyle='rgba(255,255,255,.32)'; g.lineWidth=1.8; g.stroke();
+    g.fillStyle='#fff'; g.fillText(badge,w-64,76);
+
+    if(m){
+      g.fillStyle='#EADFE3'; g.font='400 30px Amiri';
+      wrapText(g,'«'+m.body+'»',w-44,250,w-88,44,5);
+      g.fillStyle='#C9A96A'; g.fillRect(w-44-84,h-212,84,4);
+      g.fillStyle='#fff'; g.font='600 42px "Noto Kufi Arabic"';
+      wrapText(g,m.mentor_name,w-44,h-150,w-88,52,2);
+      g.fillStyle='#C9BFC3'; g.font='400 26px "IBM Plex Sans Arabic"';
+      g.fillText(m.role_title||orgName(org),w-44,h-96);
+      g.fillStyle='#9A8E92'; g.font='400 23px "IBM Plex Sans Arabic"';
+      g.fillText('انقري لقراءة الكلمة كاملة',w-44,h-52);
+    }else{
+      g.fillStyle='#C9A96A'; g.fillRect(w-44-84,h-286,84,4);
+      g.fillStyle='#fff'; g.font='600 44px "Noto Kufi Arabic"';
+      wrapText(g,orgName(org),w-44,h-224,w-88,54,2);
+      g.fillStyle='#A99DA2'; g.font='400 27px "IBM Plex Sans Arabic"';
+      g.fillText('بانتظار كلمة المشرفة الميدانية',w-44,h-130);
+      g.font='500 27px "Noto Kufi Arabic"';
+      const cta='انقري لإضافة كلمتك', cw=g.measureText(cta).width+48;
+      g.fillStyle='rgba(201,169,106,.22)'; rrect(g,w-44-cw,h-104,cw,54,27); g.fill();
+      g.strokeStyle='rgba(201,169,106,.75)'; g.lineWidth=2; g.stroke();
+      g.fillStyle='#E9D9B4'; g.fillText(cta,w-68,h-68);
     }
   });
 }
@@ -554,6 +629,73 @@ function boothTextures(b,i){
   return {plate,placard,posterFallback};
 }
 
+/* --- بوستر الجناح: تركيب الصورة مع تدرّج وطباعة كبيرة (لا صورة خام) --- */
+function rrect(g,x,y,w,h,r){ if(g.roundRect){g.beginPath();g.roundRect(x,y,w,h,r);return;} g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath(); }
+function kindChips(b){
+  const out=[];
+  String(b.highlights||'').split('\n').forEach(l=>{
+    const m=l.match(/^[•\s]*([^\(\)]+?)\s*\((\d+)\)/);
+    if(m) out.push({k:m[1].trim(), n:m[2]});
+  });
+  return out.slice(0,3);
+}
+function heroPoster(b,img){
+  return texCanvas(900,1250,(g,w,h)=>{
+    // الخلفية: الصورة بملء الإطار، أو تدرّج عنّابي إن لم توجد
+    if(img){
+      const ar=img.width/img.height, car=w/h;
+      let sw=img.width, sh=img.height, sx=0, sy=0;
+      if(ar>car){ sw=img.height*car; sx=(img.width-sw)/2; } else { sh=img.width/car; sy=(img.height-sh)/2; }
+      g.drawImage(img,sx,sy,sw,sh,0,0,w,h);
+    }else{
+      const gr=g.createLinearGradient(0,0,w,h); gr.addColorStop(0,'#8E2347'); gr.addColorStop(1,'#3B0A1C');
+      g.fillStyle=gr; g.fillRect(0,0,w,h);
+    }
+    // حجاب داكن أسفل الصورة ليقرأ النص
+    const scrim=g.createLinearGradient(0,h*0.28,0,h);
+    scrim.addColorStop(0,'rgba(12,8,10,0)'); scrim.addColorStop(0.45,'rgba(12,8,10,.70)'); scrim.addColorStop(1,'rgba(12,8,10,.95)');
+    g.fillStyle=scrim; g.fillRect(0,h*0.28,w,h*0.72);
+    const top=g.createLinearGradient(0,0,0,h*0.22);
+    top.addColorStop(0,'rgba(12,8,10,.55)'); top.addColorStop(1,'rgba(12,8,10,0)');
+    g.fillStyle=top; g.fillRect(0,0,w,h*0.22);
+
+    g.direction='rtl'; g.textAlign='right';
+    // شارة علوية
+    g.font='500 30px "Noto Kufi Arabic"';
+    const badge='التدريب الميداني', bw=g.measureText(badge).width+54;
+    g.fillStyle='rgba(255,255,255,.14)'; rrect(g,w-54-bw,44,bw,58,29); g.fill();
+    g.strokeStyle='rgba(255,255,255,.34)'; g.lineWidth=2; g.stroke();
+    g.fillStyle='#fff'; g.fillText(badge,w-81,83);
+
+    // الكتلة السفلية
+    let y=h-74;
+    const chips=kindChips(b);
+    if(chips.length){
+      g.font='500 27px "IBM Plex Sans Arabic"';
+      let x=w-54;
+      chips.forEach(c=>{
+        const t=c.k+' · '+c.n, cw=g.measureText(t).width+40;
+        g.fillStyle='rgba(201,169,106,.20)'; rrect(g,x-cw,y-36,cw,52,26); g.fill();
+        g.strokeStyle='rgba(201,169,106,.60)'; g.lineWidth=1.6; g.stroke();
+        g.fillStyle='#E9D9B4'; g.fillText(t,x-20,y);
+        x-=cw+14;
+      });
+      y-=72;
+    }
+    if(b.title){ g.fillStyle='#EADFE3'; g.font='400 32px "IBM Plex Sans Arabic"'; g.fillText(String(b.title).slice(0,46),w-54,y); y-=40; }
+    g.fillStyle='#C9A96A'; g.fillRect(w-54-96,y-14,96,4); y-=46;
+    // العنوان يُقاس أولًا ثم يُرسم صاعدًا حتى لا يتداخل مع الخط الذهبي
+    g.fillStyle='#fff'; g.font='600 62px "Noto Kufi Arabic"';
+    const title=String(orgName(b.org)||b.student_name||''), maxW=w-108;
+    let line='', tl=[];
+    title.split(/\s+/).forEach(wd=>{ const t=line?line+' '+wd:wd; if(g.measureText(t).width>maxW&&line){tl.push(line);line=wd;} else line=t; });
+    if(line) tl.push(line);
+    tl=tl.slice(0,2);
+    const titleTop=y-(tl.length-1)*74;
+    tl.forEach((l,idx)=>g.fillText(l,w-54,titleTop+idx*74));
+  });
+}
+
 function buildBooth(b,i){
   const g=new THREE.Group(); const t=boothTextures(b,i);
   const panel=new THREE.Mesh(new THREE.BoxGeometry(6.2,3.9,0.18),new THREE.MeshStandardMaterial({color:col(0xfaf5ee),roughness:.9})); panel.position.set(0,1.95,-0.09); g.add(panel);
@@ -562,9 +704,13 @@ function buildBooth(b,i){
   const plate=new THREE.Mesh(new THREE.PlaneGeometry(5.5,0.7),new THREE.MeshBasicMaterial({map:t.plate})); plate.position.set(0,3.45,0.02); g.add(plate);
   // البوستر (يمين الزائر = +x بعد الدوران، لكن محليًا نضعه عند x=+1.9)
   const pf=new THREE.Mesh(new THREE.BoxGeometry(1.95,2.65,0.06),darkMat); pf.position.set(1.95,1.65,0.03); g.add(pf);
-  const posterMat=new THREE.MeshBasicMaterial({map:t.posterFallback});
+  const posterMat=new THREE.MeshBasicMaterial({map:heroPoster(b,null)});
   const poster=new THREE.Mesh(new THREE.PlaneGeometry(1.8,2.5),posterMat); poster.position.set(1.95,1.65,0.07); g.add(poster);
-  if(b.poster_url){new THREE.TextureLoader().setCrossOrigin('anonymous').load(b.poster_url,tx=>{tx.encoding=THREE.sRGBEncoding;tx.anisotropy=8;posterMat.map=tx;posterMat.needsUpdate=true;const ar=tx.image.width/tx.image.height;const H=2.5,W=Math.min(2.6,H*ar);poster.geometry.dispose();poster.geometry=new THREE.PlaneGeometry(W,H);pf.geometry.dispose();pf.geometry=new THREE.BoxGeometry(W+.15,H+.15,0.06);});}
+  if(b.poster_url){
+    const im=new Image(); im.crossOrigin='anonymous';
+    im.onload=()=>{ const tex=heroPoster(b,im); posterMat.map=tex; posterMat.needsUpdate=true; };
+    im.src=b.poster_url;
+  }
   // الشاشة
   const sf=new THREE.Mesh(new THREE.BoxGeometry(3.0,1.8,0.08),darkMat); sf.position.set(-1.4,1.95,0.03); g.add(sf);
   const screenMat=new THREE.MeshBasicMaterial({map:t.placard});

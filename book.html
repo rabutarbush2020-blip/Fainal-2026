@@ -1066,17 +1066,21 @@ async function reload(){
   buildPages();buildToc();
   ld('تجهيز المشهد');
   const q=new URLSearchParams(location.search);
-  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let pref=null;try{pref=localStorage.getItem('bookMode')}catch(e){}
   three=(q.get('simple')==='1'||typeof THREE==='undefined')?null:initThree();
   const hm=/s=(\d+)(?:&f=([RL]))?/.exec(location.hash);
   if(hm){st.turned=clamp(+hm[1],0,L+1);st.focus=hm[2]||'R'}
   if(three){rebuildBook();camTo('intro',0);initDrag();requestAnimationFrame(loop)}
-  const wantSimple=!three||pref==='simple'||(reduced&&pref!=='3d');
-  setMode(wantSimple?'simple':'3d');
-  if(!three)$('#btnMode').style.display='none';
-  if(reduced&&three&&wantSimple)toast('عُرض المعرض بصورة مبسّطة لأن جهازك يفضّل تقليل الحركة. يمكنك التبديل من الأعلى.',4200);
+  // 3D always; the flat view is only an automatic fallback when the device cannot draw 3D
+  setMode(three?'3d':'simple');
+  $('#btnMode').style.display='none';
   $('#loader').style.opacity=0;setTimeout(()=>$('#loader').remove(),500);
+  // music right away: browsers allow sound only after the first touch/click/key, so start then (unless turned off before)
+  if(musPref()!=='0'){
+    setMusic(true);
+    const kick=()=>{if(musPref()!=='0'){if(!MUS.on)setMusic(true);else if(MUS.ctx&&MUS.ctx.state!=='running')MUS.ctx.resume()}
+      ['pointerdown','keydown','touchstart'].forEach(ev=>removeEventListener(ev,kick,true))};
+    ['pointerdown','keydown','touchstart'].forEach(ev=>addEventListener(ev,kick,true));
+  }
   window.__book={st,goSpread,goPage,goOrg,next,prev,get L(){return L},get PAGES(){return PAGES},three:()=>three};
 })();
 </script>

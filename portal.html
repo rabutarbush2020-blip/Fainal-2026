@@ -359,6 +359,9 @@ function countTo(el,target){
 /* تعبئة قائمة المؤسسات في النموذج */
 $('cOrg').innerHTML='<option value="">— غير محدّد —</option>'+ORGS.filter(o=>o!=='أخرى').map(o=>'<option value="'+esc(o)+'">'+esc(orgName(o))+'</option>').join('')+'<option>أخرى</option>';
 
+/* العدد الرسمي لطالبات التدريب الميداني في خريف ٢٠٢٦ (لا يُحسب من المنصة لأن بعضهن لم ترفع أنشطة بعد) */
+const STUDENTS_TOTAL=44;
+
 /* تحميل البيانات الحيّة */
 (async()=>{
   const [statsR, boothsR, mentorsR, headR] = await Promise.allSettled([
@@ -374,7 +377,7 @@ $('cOrg').innerHTML='<option value="">— غير محدّد —</option>'+ORGS.f
   const totalStud = stats.reduce((a,s)=>a+(+s.students||0),0);
   countTo($('stOrgs'), stats.length);
   countTo($('stActs'), totalActs);
-  countTo($('stStudents'), totalStud);
+  countTo($('stStudents'), STUDENTS_TOTAL||totalStud);
   countTo($('stWords'), mentors.length);
 
   /* الأجنحة */

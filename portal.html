@@ -148,10 +148,14 @@ footer .sp{margin-inline-start:auto}
 @media (max-width:620px){
   .wrap{width:min(var(--wrap),100% - 32px)}
   .g3,.g2,.booths,.words,.orgs,.f2{grid-template-columns:1fr}
+  .howto ol{padding-inline-start:20px}
   .stats{grid-template-columns:repeat(2,1fr);gap:20px 14px}
   .btn{padding:13px 20px}
   .band .btn{margin-inline-start:0}
 }
+.howto ol{margin:10px 0 0;padding-inline-start:22px;display:grid;gap:9px;line-height:1.85;font-size:15.5px}
+.howto h3{margin:0}
+[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -162,11 +166,10 @@ footer .sp{margin-inline-start:auto}
     <div class="eyebrow">الخدمة الاجتماعية · قسم العلوم الاجتماعية · جامعة قطر</div>
     <h1>معرض إنجازات الطالبات في <em>التدريب الميداني</em></h1>
     <div class="eyebrow" style="margin-top:-6px">خريف ٢٠٢٦</div>
-    <p>قاعة عرض افتراضية توثّق ما نفّذته طالبات التدريب الميداني من برامج وقائية وعلاجية وتنموية في مؤسساتهن التدريبية، وتُفرد لكل مؤسسة موضعًا تُنشر فيه كلمة مشرفتها الميدانية.</p>
+    <p>معرض افتراضي يوثّق ما نفّذته طالبات التدريب الميداني من برامج وقائية وعلاجية وتنموية في مؤسساتهن التدريبية.</p>
     <div class="cta">
-      <a class="btn" href="hall.html"><svg viewBox="0 0 24 24"><path d="M6 4l13 8-13 8z"/></svg> ادخلي القاعة</a>
-      <a class="btn line" href="index.html">المعرض الافتراضي</a>
-      <a class="btn line" href="hall.html#stage">كلمة الافتتاح</a>
+      <a class="btn" href="index.html"><svg viewBox="0 0 24 24"><path d="M6 4l13 8-13 8z"/></svg> ادخلي المعرض الافتراضي</a>
+      <a class="btn line" href="hall.html">القاعة ثلاثية الأبعاد</a>
     </div>
     <div class="stats">
       <div class="s"><b id="stOrgs">—</b><span>مؤسسة تدريبية</span></div>
@@ -181,10 +184,27 @@ footer .sp{margin-inline-start:auto}
 <!-- ============ أقسام المعرض ============ -->
 <section id="sections">
   <div class="wrap rv">
-    <div class="eyebrow">أقسام المعرض</div>
-    <h2>ماذا ستجدين داخل القاعة</h2>
-    <p class="lede">المعرض قاعة واحدة تُجال من المدخل إلى الصدر، مقسّمة إلى أقسام يصل إليها الزائر بزرّين أو من الفهرس مباشرة.</p>
-    <div class="grid g3">
+    <div class="eyebrow">طريقة المشاركة</div>
+    <h2>كيف ترفعين مشاركتك</h2>
+    <div class="grid g2 howto">
+      <div class="card"><h3>للطالبات</h3>
+        <ol>
+          <li>ارفعي النشاط في منصة التدريب الميداني كالمعتاد: العنوان، والنوع، ودورك، وصورة النشاط.</li>
+          <li>صوّري الأدوات والمكان فقط؛ لا وجوه ولا أسماء ولا ما يدل على حالة فردية.</li>
+          <li>بعد اعتماد المشرفة يُختار النشاط للمعرض ويظهر في جناح مؤسستك.</li>
+          <li>كلمة الطالبات للمؤسسة (مكتوبة أو صوتية أو فيديو): أرسلنها إلى المشرفة الأكاديمية مع موافقتكن على النشر.</li>
+        </ol></div>
+      <div class="card"><h3>للمشرفات والأخصائيات الاجتماعيات</h3>
+        <ol>
+          <li>افتحي المعرض، ثم الفهرس، واختاري مؤسستك.</li>
+          <li>انتقلي إلى صفحة «كلمة الأخصائيات الاجتماعيات» واضغطي «أضيفي كلمتكن».</li>
+          <li>أدخلي رمز المؤسسة (٦ أرقام) الذي تسلّمته من المشرفة الأكاديمية.</li>
+          <li>اختاري: كلمة مكتوبة، أو كلمة صوتية (تسجيل مباشر أو رفع ملف)، وأضيفي التوقيع.</li>
+          <li>احفظي مسودة، ثم «معاينة»، ثم «نشر الكلمة».</li>
+        </ol>
+        <a class="btn" href="index.html" style="margin-top:14px">افتحي المعرض</a></div>
+    </div>
+    <div class="grid g3" hidden>
       <div class="card"><span class="ic"><svg viewBox="0 0 24 24"><path d="M21 5.5v8a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3.5V16H5.5A2.5 2.5 0 0 1 3 13.5v-8A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5z"/><path d="M9.3 7.4v3.3M14.7 7.4v3.3"/></svg></span>
         <h3>منصة الافتتاح</h3><p>كلمة رئيس القسم على شاشة كبيرة في صدر القاعة، نصًا أو تسجيلًا مرئيًا.</p>
         <a class="go" href="hall.html#stage">إلى المنصة <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></a></div>
@@ -234,7 +254,7 @@ footer .sp{margin-inline-start:auto}
 </section>
 
 <!-- ============ الأدوات ============ -->
-<section id="tools" style="background:#fff">
+<section id="tools" style="background:#fff" hidden>
   <div class="wrap rv">
     <div class="eyebrow">أدوات المعرض</div>
     <h2>كيف يعمل المعرض</h2>
@@ -276,9 +296,9 @@ footer .sp{margin-inline-start:auto}
     <div class="contact">
       <aside class="visitcard">
         <span class="badge">زيارة المعرض · دقيقتان</span>
-        <h3>تجوّلي في القاعة قبل أن تكتبي</h3>
+        <h3>تجوّلي في المعرض قبل أن تكتبي</h3>
         <p>افتحي المعرض وشاهدي أجنحة المؤسسات وكلمات المشرفات، ثم أخبرينا كيف تودّين المشاركة.</p>
-        <a class="btn" href="hall.html">ادخلي القاعة</a>
+        <a class="btn" href="index.html">ادخلي المعرض</a>
       </aside>
 
       <form class="form" id="cForm">
@@ -305,7 +325,7 @@ footer .sp{margin-inline-start:auto}
 
 <footer>
   <div class="wrap">
-    <div><b>المعرض الافتراضي لأنشطة التدريب الميداني</b>قسم العلوم الاجتماعية · جامعة قطر</div>
+    <div><b>الخدمة الاجتماعية · معرض إنجازات الطالبات · خريف ٢٠٢٦</b>قسم العلوم الاجتماعية · جامعة قطر</div>
     <div class="sp"><a href="hall.html">القاعة الافتراضية</a> · <a href="index.html">المعرض الافتراضي</a></div>
   </div>
 </footer>

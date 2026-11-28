@@ -51,6 +51,17 @@ button,input,textarea,select{font:inherit}
 .pg .card{width:248px;height:300px;border:1px solid var(--line);border-radius:10px;background:rgba(255,253,250,.6);padding:0;overflow:hidden;text-align:right;color:var(--ink)}
 .pg .card:hover,.pg .card:focus-visible{border-color:var(--g);box-shadow:0 6px 18px rgba(60,30,20,.14);outline:none}
 .pg .card img{display:block;width:100%;height:180px;object-fit:cover}
+/* subtle motion on photos: slow drift-and-zoom, each card on its own rhythm */
+@keyframes drift{0%{transform:scale(1.02) translate(0,0)}50%{transform:scale(1.09) translate(-2%,-1.5%)}100%{transform:scale(1.02) translate(1.5%,1%)}}
+.pg .card{isolation:isolate}
+.pg .card img,.pg .poster img{animation:drift 14s ease-in-out infinite alternate;will-change:transform}
+.pg .card:nth-of-type(2) img{animation-duration:17s;animation-delay:-4s}
+.pg .card:nth-of-type(3) img{animation-duration:15s;animation-delay:-8s;animation-direction:alternate-reverse}
+.pg .card:nth-of-type(4) img{animation-duration:19s;animation-delay:-2s}
+.pg .card:hover img{animation-play-state:paused;transform:scale(1.1)}
+.media-main{overflow:hidden}
+.media-main img{animation:drift 16s ease-in-out infinite alternate}
+.thumbs img{transition:transform .4s}.thumbs button:hover img{transform:scale(1.12)}
 .pg .card .noimg{display:grid;place-items:center;height:180px;background:linear-gradient(135deg,#7E1532,#5a0f25);color:#E4D5B0;font:600 18px "Noto Kufi Arabic";border-bottom:3px solid #B8933F}
 .pg .card .k{display:block;margin:12px 14px 0;font:600 12px "IBM Plex Sans Arabic";color:var(--g)}
 .pg .card .h{margin:4px 14px 0;font:600 16px/26px "Noto Kufi Arabic";display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -201,7 +212,7 @@ body.simple #stage,body.simple #overlay,body.simple #vign,body.simple #intro{dis
   <button class="tb" id="btnMode" aria-pressed="false"><span id="modeTxt">عرض مبسّط</span></button>
 </header>
 
-<div id="intro"><p class="kick">الخدمة الاجتماعية · جامعة قطر</p><h1>معرض إنجازات الطالبات في التدريب الميداني</h1><p>خريف ٢٠٢٦ · أنشطة الطالبات وكلمات شركائنا في الميدان</p><button class="cta" id="btnOpen">ادخلي المعرض</button></div>
+<div id="intro"><p class="kick">الخدمة الاجتماعية · جامعة قطر</p><h1>معرض إنجازات الطالبات في التدريب الميداني</h1><p>خريف ٢٠٢٦ · أنشطة الطالبات وكلمات شركائنا في الميدان</p><button class="cta" id="btnOpen">المعرض الافتراضي</button></div>
 
 <nav class="nav" aria-label="التنقل بين الصفحات">
   <button class="rb" id="btnPrev" aria-label="الصفحة السابقة"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -261,7 +272,7 @@ const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const lerp=(a,b,t)=>a+(b-a)*t;
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 function toast(m,ms){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('on'),ms||2600)}
-function errMsg(e){const m=String(e&&e.message||e);if(/bad_code/.test(m))return'الرمز غير صحيح لهذه المؤسسة.';if(/bad_pass/.test(m))return'كلمة المرور غير صحيحة.';if(/empty_body/.test(m))return'اكتبي نص الكلمة قبل النشر.';if(/Failed to fetch|NetworkError/.test(m))return'تعذّر الاتصال. تحقّقي من الإنترنت وأعيدي المحاولة.';return m}
+function errMsg(e){const m=String(e&&e.message||e);if(/bad_code/.test(m))return'الرمز غير صحيح.';if(/bad_media/.test(m))return'رابط الملف غير مقبول؛ ارفع الملف من هذه الصفحة.';if(/bad_pass/.test(m))return'كلمة المرور غير صحيحة.';if(/empty_body/.test(m))return'اكتب نص الكلمة قبل النشر.';if(/Failed to fetch|NetworkError/.test(m))return'تعذّر الاتصال. تحقّق من الإنترنت وأعد المحاولة.';return m}
 function sget(k){try{return sessionStorage.getItem(k)}catch(e){return null}}
 function sset(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}
 
@@ -357,14 +368,14 @@ function pageHTML(p,src){
     h+='<div class="ab ttl ink">'+esc(H.title_line||W.title)+'</div>';
     if(x.org)h+='<div class="ab wsub ink">إلى '+esc(orgName(x.org))+'</div>';
     if(okWord(H)){
-      if(H.video)h+='<button class="ab poster" data-act="play" data-who="'+who+'" aria-label="تشغيل فيديو '+esc(W.row)+'">'+(H.poster?'<img alt="" src="'+esc(srcURL(H.poster))+'">':'')+'<span class="pl"><i></i></span><span class="cap">شاهدي الكلمة</span></button>';
+      if(H.video)h+='<button class="ab poster" data-act="play" data-who="'+who+'" aria-label="تشغيل فيديو '+esc(W.row)+'">'+(H.poster?'<img alt="" src="'+esc(srcURL(H.poster))+'">':'')+'<span class="pl"><i></i></span><span class="cap">شاهد الكلمة</span></button>';
       const aTop=H.video?452:150,bTop=headBodyTop(H);
-      if(H.audio)h+='<div class="ab vbox" style="top:'+aTop+'px"><span>كلمة صوتية · استمعي إليها</span><audio controls preload="none" src="'+esc(H.audio)+'"></audio></div>';
+      if(H.audio)h+='<div class="ab vbox" style="top:'+aTop+'px"><span>كلمة صوتية · استمع إليها</span><audio controls preload="none" src="'+esc(H.audio)+'"></audio></div>';
       if(H.body)h+='<div class="ab quote ink" style="top:'+bTop+'px;max-height:'+(680-bTop)+'px;overflow:auto;pointer-events:auto">'+esc(H.body)+'</div>';
       h+='<div class="ab who ink" style="top:700px">'+esc(H.name||W.sig||'')+'</div><div class="ab whos" style="top:732px">'+esc(H.role||'')+'</div>';
     }else h+='<div class="ab empty"><p>'+W.empty+'</p></div>';
   }else if(x.t==='index'){
-    h+='<div class="ab lab ink">الفهرس</div><div class="ab ttl ink">المؤسسات التدريبية</div><div class="ab sub">اختاري جناحاً للانتقال إليه مباشرة</div>';
+    h+='<div class="ab lab ink">الفهرس</div><div class="ab ttl ink">المؤسسات التدريبية</div><div class="ab sub">اختر جناحاً للانتقال إليه مباشرة</div>';
     const rows=FRONT_ROWS().concat((DATA.orgs||[]).map(o=>({name:o.org,page:ORG_START[o.org],go:o.org})));
     const rh=rows.length>11?40:50;
     rows.forEach((r,i)=>{const has=r.page!=null;h+='<'+(has?'button':'div')+' class="ab row" style="top:'+(186+i*rh)+'px'+(has?'':';opacity:.6')+'"'+(has?' data-act="jump" data-org="'+esc(r.go)+'"':'')+'><span class="n">'+AR(i+1)+'</span><span class="t">'+esc(orgName(r.name))+'</span><span class="d"></span><span class="p">'+(has?AR(r.page+1):'قريباً')+'</span></'+(has?'button':'div')+'>'});
@@ -373,7 +384,7 @@ function pageHTML(p,src){
     if(x.demo)h+='<div class="ab demo">محتوى تجريبي</div>';
     h+=emblemSVG()+'<div class="ab oname ink">'+esc(x.org)+'</div><div class="ab obio ink" style="max-height:224px;overflow:hidden">'+esc(x.bio||'')+'</div>';
     h+='<div class="ab chips"><span class="chip">'+AR(x.count)+' '+(x.count===1?'نشاط':'أنشطة')+'</span><button class="chip hit" data-act="word" data-org="'+esc(x.org)+'">كلمة الأخصائيات</button></div>';
-    h+='<div class="ab hint">اسحبي زاوية الصفحة لتصفّح الأنشطة</div>';
+    h+='<div class="ab hint">اسحب زاوية الصفحة لتصفّح الأنشطة</div>';
   }else if(x.t==='gallery'){
     h+='<div class="ab lab ink">'+esc(x.org)+'</div><div class="ab ttl ink">أنشطة الطالبات'+(x.pn>1?' <span style="font-size:15px;color:#6A5F63">('+AR(x.pi)+' من '+AR(x.pn)+')</span>':'')+'</div>';
     x.items.forEach((a,i)=>{const top=i<2?150:470;
@@ -384,14 +395,14 @@ function pageHTML(p,src){
     if(w){
       if(w.is_demo)h+='<div class="ab demo">محتوى تجريبي</div>';
       const hasA=!!w.audio,top0=hasA?(w.body?286:210):200;
-      if(hasA)h+='<div class="ab vbox"><span>كلمة صوتية · استمعي إليها</span><audio controls preload="none" src="'+esc(w.audio)+'"></audio></div>';
+      if(hasA)h+='<div class="ab vbox"><span>كلمة صوتية · استمع إليها</span><audio controls preload="none" src="'+esc(w.audio)+'"></audio></div>';
       if(w.body)h+='<div class="ab wbody ink" tabindex="0" style="top:'+top0+'px;height:'+(636-top0)+'px">'+esc(w.body)+'</div>';
       h+='<div class="ab sep"></div>';
       h+='<div class="ab who ink" style="top:678px">'+esc(w.name||'الأخصائيات الاجتماعيات')+'</div><div class="ab whos" style="top:708px">'+esc(w.role||'')+'</div>';
       h+='<div class="ab sig">'+(w.sig_url?'<img alt="التوقيع" src="'+esc(w.sig_url)+'">':'<span class="st">'+esc(w.sig_text||w.name||'')+'</span>')+'<small>'+(w.published_at?dateAr(w.published_at):'')+'</small></div>';
       if(!src)h+='<button class="ab mbtn" data-act="mentor" data-org="'+esc(x.org)+'">للأخصائيات: تعديل الكلمة</button>';
     }else{
-      h+='<div class="ab empty"><p>لم تُنشر كلمة الأخصائيات الاجتماعيات بعد.<br>يمكن أن تكون مكتوبة أو صوتية.</p><button class="btnm" data-act="mentor" data-org="'+esc(x.org)+'">أضيفي كلمتكن — كتابةً أو صوتاً</button></div>';
+      h+='<div class="ab empty"><p>لم تُنشر كلمة الأخصائيات الاجتماعيات بعد.<br>يمكن أن تكون مكتوبة أو صوتية.</p><button class="btnm" data-act="mentor" data-org="'+esc(x.org)+'">أضف الكلمة — كتابةً أو صوتاً</button></div>';
     }
   }else if(x.t==='filler'){
     h+='<div class="ab center" style="top:360px;font:400 30px Amiri,serif;color:#B8933F">✦</div><div class="ab center ink" style="top:410px;font:400 20px/1.9 Amiri,serif;color:#6A5F63">التعلّم في الميدان يبدأ من الإصغاء</div>';
@@ -421,9 +432,9 @@ function drawPage(g,p,redraw){
     if(x.org){g.font='600 16px "Noto Kufi Arabic"';g.fillStyle='#7E1532';g.textAlign='right';g.fillText('إلى '+orgName(x.org),552,134)}
     if(!okWord(H)){g.font='400 17px "IBM Plex Sans Arabic"';g.fillStyle='#6A5F63';txt(g,W.empty,300,300,460,30,3,'center')}
     if(okWord(H)){if(H.video){g.fillStyle='#2b2126';rr(g,48,150,504,284,10);g.fill();if(H.poster)img(H.poster,48,150,504,284,10);g.fillStyle='rgba(255,253,250,.94)';g.beginPath();g.arc(300,292,38,0,7);g.fill();g.fillStyle='#7E1532';g.beginPath();g.moveTo(292,278);g.lineTo(314,292);g.lineTo(292,306);g.fill()}
-      if(H.audio){const aT=H.video?452:150;g.fillStyle='rgba(126,21,50,.06)';rr(g,48,aT,504,80,12);g.fill();g.fillStyle='#B8933F';g.font='600 13px "IBM Plex Sans Arabic"';g.textAlign='right';g.fillText('كلمة صوتية · استمعي إليها',538,aT+12);g.fillStyle='#7E1532';g.beginPath();g.arc(520,aT+54,15,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.moveTo(515,aT+46);g.lineTo(527,aT+54);g.lineTo(515,aT+62);g.fill();g.fillStyle='rgba(126,21,50,.25)';g.fillRect(64,aT+52,430,4)}
+      if(H.audio){const aT=H.video?452:150;g.fillStyle='rgba(126,21,50,.06)';rr(g,48,aT,504,80,12);g.fill();g.fillStyle='#B8933F';g.font='600 13px "IBM Plex Sans Arabic"';g.textAlign='right';g.fillText('كلمة صوتية · استمع إليها',538,aT+12);g.fillStyle='#7E1532';g.beginPath();g.arc(520,aT+54,15,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.moveTo(515,aT+46);g.lineTo(527,aT+54);g.lineTo(515,aT+62);g.fill();g.fillStyle='rgba(126,21,50,.25)';g.fillRect(64,aT+52,430,4)}
       const bT=headBodyTop(H);if(H.body){g.font=F.q;g.fillStyle='#2a2226';txt(g,H.body,552,bT,504,34,Math.floor((680-bT)/34))}g.font=F.who;g.fillStyle='#191417';g.textAlign='right';g.fillText(H.name||W.sig||'',552,700);g.font=F.sm;g.fillStyle='#6A5F63';g.fillText(H.role||'',552,734)}
-  }else if(x.t==='index'){lab('الفهرس');ttl('المؤسسات التدريبية');g.font='400 14px "IBM Plex Sans Arabic"';g.fillStyle='#6A5F63';g.textAlign='right';g.fillText('اختاري جناحاً للانتقال إليه مباشرة',552,140);
+  }else if(x.t==='index'){lab('الفهرس');ttl('المؤسسات التدريبية');g.font='400 14px "IBM Plex Sans Arabic"';g.fillStyle='#6A5F63';g.textAlign='right';g.fillText('اختر جناحاً للانتقال إليه مباشرة',552,140);
     const rows=FRONT_ROWS().concat((DATA.orgs||[]).map(o=>({name:o.org,page:ORG_START[o.org]})));const rh=rows.length>11?40:50;
     rows.forEach((r,i)=>{const y=186+i*rh+22;r={name:orgName(r.name),page:r.page};g.globalAlpha=r.page==null?.6:1;g.strokeStyle='#B8933F';g.lineWidth=1.5;g.beginPath();g.arc(538,y,14,0,7);g.stroke();g.fillStyle='#7E1532';g.font='600 12px "IBM Plex Sans Arabic"';g.textAlign='center';g.textBaseline='middle';g.fillText(AR(i+1),538,y+1);
       g.font='600 16px "Noto Kufi Arabic"';g.fillStyle='#191417';g.textAlign='right';g.fillText(r.name,512,y);const tw=g.measureText(r.name).width;g.font='500 14px "IBM Plex Sans Arabic"';g.fillStyle='#6A5F63';g.textAlign='left';g.fillText(r.page==null?'قريباً':AR(r.page+1),54,y);
@@ -434,14 +445,14 @@ function drawPage(g,p,redraw){
     g.font='700 31px "Noto Kufi Arabic"';g.fillStyle='#7E1532';txt(g,x.t==='org'?x.org:'شكراً لشركائنا في الميدان',300,x.t==='org'?306:316,480,48,2,'center');
     g.font='400 17px "IBM Plex Sans Arabic"';g.fillStyle='#3a3034';txt(g,x.t==='org'?x.bio:'هذا المعرض حصيلة شراكة بين القسم والمؤسسات التدريبية، وثمرة جهد طالبات قدّمن خدماتهن المهنية لعملاء هذه المؤسسات. شكراً جزيلاً للمشرفات ولفريق العمل في كل مؤسسة على توجيه الطالبات.',300,436,460,32,7,'center');
     g.textAlign='center';
-    if(x.t==='org'){g.font='600 13px "IBM Plex Sans Arabic"';g.fillStyle='#7E1532';g.fillText(AR(x.count)+' '+(x.count===1?'نشاط':'أنشطة')+'      ·      كلمة الأخصائيات',300,662);g.font=F.sm;g.fillStyle='#6A5F63';g.fillText('اسحبي زاوية الصفحة لتصفّح الأنشطة',300,730)}
+    if(x.t==='org'){g.font='600 13px "IBM Plex Sans Arabic"';g.fillStyle='#7E1532';g.fillText(AR(x.count)+' '+(x.count===1?'نشاط':'أنشطة')+'      ·      كلمة الأخصائيات',300,662);g.font=F.sm;g.fillStyle='#6A5F63';g.fillText('اسحب زاوية الصفحة لتصفّح الأنشطة',300,730)}
     else{g.font='500 14px "IBM Plex Sans Arabic"';g.fillStyle='#6A5F63';g.fillText('قسم العلوم الاجتماعية · كلية الآداب والعلوم · جامعة قطر',300,664)}
   }else if(x.t==='gallery'){lab(x.org);ttl('أنشطة الطالبات');
     x.items.forEach((a,i)=>{const X=i%2===0?304:48,Y=i<2?150:470;g.fillStyle='rgba(255,253,250,.6)';rr(g,X,Y,248,300,10);g.fill();g.strokeStyle='#E0D7CB';g.lineWidth=1;g.stroke();if(firstImage(a))img(firstImage(a),X,Y,248,180);else{g.save();rr(g,X,Y,248,180,10);g.clip();const gr=g.createLinearGradient(X,Y,X+248,Y+180);gr.addColorStop(0,'#7E1532');gr.addColorStop(1,'#5a0f25');g.fillStyle=gr;g.fillRect(X,Y,248,180);g.fillStyle='#B8933F';g.fillRect(X,Y+177,248,3);g.font='600 18px "Noto Kufi Arabic"';g.fillStyle='#E4D5B0';g.textAlign='center';g.fillText(a.kind||'نشاط',X+124,Y+76);g.restore()}
       g.font='600 12px "IBM Plex Sans Arabic"';g.fillStyle='#B8933F';g.textAlign='right';g.fillText(a.kind||'نشاط',X+234,Y+194);g.font='600 16px "Noto Kufi Arabic"';g.fillStyle='#191417';txt(g,a.title,X+234,Y+214,220,26,2)});
   }else if(x.t==='word'){lab(WORD_LAB);ttl(WORD_TTL);g.font='600 16px "Noto Kufi Arabic"';g.fillStyle='#7E1532';g.textAlign='right';g.fillText(orgPrep(x.org),552,134);const w=x.w;
     if(w){if(w.is_demo)demo();const hasA=!!w.audio,top0=hasA?(w.body?286:210):200;
-      if(hasA){g.fillStyle='rgba(126,21,50,.06)';rr(g,48,190,504,80,12);g.fill();g.fillStyle='#B8933F';g.font='600 13px "IBM Plex Sans Arabic"';g.textAlign='right';g.fillText('كلمة صوتية · استمعي إليها',538,202);g.fillStyle='#7E1532';g.beginPath();g.arc(520,244,15,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.moveTo(515,236);g.lineTo(527,244);g.lineTo(515,252);g.fill();g.fillStyle='rgba(126,21,50,.25)';g.fillRect(64,242,430,4)}
+      if(hasA){g.fillStyle='rgba(126,21,50,.06)';rr(g,48,190,504,80,12);g.fill();g.fillStyle='#B8933F';g.font='600 13px "IBM Plex Sans Arabic"';g.textAlign='right';g.fillText('كلمة صوتية · استمع إليها',538,202);g.fillStyle='#7E1532';g.beginPath();g.arc(520,244,15,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.moveTo(515,236);g.lineTo(527,244);g.lineTo(515,252);g.fill();g.fillStyle='rgba(126,21,50,.25)';g.fillRect(64,242,430,4)}
       if(w.body){g.font=F.q;g.fillStyle='#2a2226';txt(g,w.body,552,top0,504,34,Math.floor((630-top0)/34))}
       g.fillStyle='rgba(184,147,63,.5)';g.fillRect(48,650,504,1);g.font=F.who;g.fillStyle='#191417';g.textAlign='right';g.fillText(w.name||'الأخصائيات الاجتماعيات',552,678);g.font=F.sm;g.fillStyle='#6A5F63';g.fillText(w.role||'',552,710);
       if(w.sig_url){const o=loadImg(w.sig_url,redraw);if(o&&o.ready){const im=o.img,s=Math.min(220/im.naturalWidth,66/im.naturalHeight);g.globalCompositeOperation='multiply';g.drawImage(im,163-im.naturalWidth*s/2,676,im.naturalWidth*s,im.naturalHeight*s);g.globalCompositeOperation='source-over'}}
@@ -717,7 +728,7 @@ function initDrag(){
 function renderSimple(){
   const sp=$('#spread'),k=st.turned,mob=mobile();let h='';
   const page=(p,cls)=>'<div class="spage '+cls+'"><div class="pg" style="transform:none">'+pageHTML(p)+'</div></div>';
-  if(k===0)h='<div class="spage cover"><div><p style="font:700 22px Noto Kufi Arabic,sans-serif;margin-bottom:14px">الخدمة الاجتماعية</p><h1>معرض إنجازات الطالبات في التدريب الميداني</h1><p>خريف ٢٠٢٦ · جامعة قطر</p><p style="margin-top:28px"><button class="cta" data-open="1">ادخلي المعرض</button></p></div></div>';
+  if(k===0)h='<div class="spage cover"><div><p style="font:700 22px Noto Kufi Arabic,sans-serif;margin-bottom:14px">الخدمة الاجتماعية</p><h1>معرض إنجازات الطالبات في التدريب الميداني</h1><p>خريف ٢٠٢٦ · جامعة قطر</p><p style="margin-top:28px"><button class="cta" data-open="1">المعرض الافتراضي</button></p></div></div>';
   else{const r=2*k-2,l=2*k-1;
     if(mob)h=st.focus==='L'&&k<=L?page(l,'l'):page(r,'r');
     else h=page(r,'r')+(k<=L?page(l,'l'):'<div class="spage l" style="background:#e9dcc3"></div>')}
@@ -729,7 +740,7 @@ function renderSimple(){
 
 /* ===== chrome ===== */
 function where(){
-  const k=st.turned;if(k===0)return['الغلاف','اسحبي الغلاف أو اضغطي «ادخلي المعرض»'];
+  const k=st.turned;if(k===0)return['الغلاف','اسحب الغلاف أو اضغط «المعرض الافتراضي»'];
   const r=2*k-2,l=2*k-1;
   if(mobile()){const p=st.focus==='L'&&k<=L?l:r;return[pageLabel(p)||'المعرض','صفحة '+AR(p+1)+' من '+AR(PAGES.length)]}
   return[pageLabel(r)||pageLabel(l)||'المعرض',k<=L?'الصفحتان '+AR(r+1)+'–'+AR(l+1)+' من '+AR(PAGES.length):'الصفحة '+AR(r+1)+' من '+AR(PAGES.length)];
@@ -786,12 +797,12 @@ function openActivity(id){
 
 /* ===== field supervisor editor (per-institution code) ===== */
 const MEN={org:null,code:null,data:null,sigMode:'text',sigUrl:''};
-function openMentor(org){
+function openMentor(org){$('#menOv header small').textContent='للأخصائيات الاجتماعيات';
   MEN.org=org||null;MEN.code=null;
   const orgs=(DATA.orgs||[]).map(o=>o.org);
   $('#menTtl').textContent=org?WORD_TTL+' '+orgPrep(org):WORD_TTL;
   const saved=org?sget('mcode:'+org):null;
-  $('#menBody').innerHTML='<div class="f"><p class="note" style="margin:0">ادخلي برمز مؤسستك المكوّن من ٦ أرقام (تسلّمه المشرفة الأكاديمية لكل مؤسسة). يمكنك الحفظ كمسودة والعودة لاحقاً، ثم المعاينة والنشر.</p>'+
+  $('#menBody').innerHTML='<div class="f"><p class="note" style="margin:0">ادخل برمز مؤسستك المكوّن من ٦ أرقام (تسلّمه المشرفة الأكاديمية لكل مؤسسة). يمكنك الحفظ كمسودة والعودة لاحقاً، ثم المعاينة والنشر.</p>'+
    (org?'':'<label>المؤسسة<select id="mOrg">'+orgs.map(o=>'<option>'+esc(o)+'</option>').join('')+'</select></label>')+
    '<label>رمز المؤسسة<input id="mCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" value="'+esc(saved||'')+'"></label><div class="msg" id="mMsg" aria-live="polite"></div><div class="btns"><button class="b p" id="mGo">دخول</button></div></div>';
   openOv('menOv');
@@ -810,7 +821,7 @@ function mentorForm(){
   MEN.mode=src.mode==='voice'||src.audio?'voice':'text';MEN.audio=src.audio||'';
   $('#menTtl').textContent=WORD_TTL+' '+orgPrep(MEN.org);
   $('#menBody').innerHTML='<div class="f">'+
-   '<p class="note" style="margin:0">'+(d.published?'لديك كلمة منشورة'+(d.published_at?' منذ '+dateAr(d.published_at):'')+'. التعديلات تُحفظ مسودة ولا تظهر للزوار حتى تضغطي «نشر».':'لم تُنشر كلمتك بعد.')+(d.draft&&d.draft.saved_at?' آخر حفظ للمسودة: '+new Date(d.draft.saved_at).toLocaleString('ar-QA')+'.':'')+'</p>'+
+   '<p class="note" style="margin:0">'+(d.published?'لديك كلمة منشورة'+(d.published_at?' منذ '+dateAr(d.published_at):'')+'. التعديلات تُحفظ مسودة ولا تظهر للزوار حتى تضغط «نشر».':'لم تُنشر كلمتك بعد.')+(d.draft&&d.draft.saved_at?' آخر حفظ للمسودة: '+new Date(d.draft.saved_at).toLocaleString('ar-QA')+'.':'')+'</p>'+
    '<div class="row2"><label>الاسم كما يظهر (اختياري)<input id="mName" maxlength="80" value="'+esc(src.name||'')+'" placeholder="الأخصائيات الاجتماعيات"></label><label>الصفة<input id="mRole" maxlength="120" value="'+esc(src.role||'')+'" placeholder="أخصائيات اجتماعيات"></label></div>'+
    '<div><div style="font:600 13px \'IBM Plex Sans Arabic\';margin-bottom:6px">نوع الكلمة</div><div class="seg" role="group" aria-label="نوع الكلمة"><button type="button" id="mdT">كلمة مكتوبة</button><button type="button" id="mdV">كلمة صوتية</button></div></div>'+
    '<div id="voiceBox" class="f" style="border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--paper)">'+
@@ -818,8 +829,8 @@ function mentorForm(){
      '<div id="audPrev"></div><small class="note">حتى ٣ دقائق. يمكنك إعادة التسجيل قبل النشر.</small></div>'+
    '<label><span id="bodyLab">نص الكلمة</span><textarea id="mBody" maxlength="2500" rows="7">'+esc(src.body||'')+'</textarea><small class="note" id="mCount"></small></label>'+
    '<div><div style="font:600 13px \'IBM Plex Sans Arabic\';margin-bottom:6px">التوقيع</div><div class="seg" role="group" aria-label="طريقة التوقيع"><button type="button" id="sgT">توقيع مكتوب</button><button type="button" id="sgI">صورة توقيع</button></div></div>'+
-   '<div id="sgTBox"><label>اكتبي توقيعك<input id="mSig" maxlength="60" value="'+esc(src.sig_text||'')+'"></label></div>'+
-   '<div id="sgIBox"><label>ارفعي صورة التوقيع (PNG بخلفية شفافة أو بيضاء، حتى ٢ م.ب)<input type="file" id="mSigFile" accept="image/png,image/jpeg,image/webp"></label></div>'+
+   '<div id="sgTBox"><label>اكتب توقيعك<input id="mSig" maxlength="60" value="'+esc(src.sig_text||'')+'"></label></div>'+
+   '<div id="sgIBox"><label>ارفع صورة التوقيع (PNG بخلفية شفافة أو بيضاء، حتى ٢ م.ب)<input type="file" id="mSigFile" accept="image/png,image/jpeg,image/webp"></label></div>'+
    '<div class="sigprev" id="sigPrev"></div><div class="msg" id="mMsg2" aria-live="polite"></div>'+
    '<div class="btns"><button class="b" id="mDraft">حفظ كمسودة</button><button class="b" id="mPrev">معاينة</button><button class="b p" id="mPub">نشر الكلمة</button></div><div id="mPv"></div></div>';
   const upd=()=>{$('#sgT').classList.toggle('on',MEN.sigMode==='text');$('#sgI').classList.toggle('on',MEN.sigMode==='img');$('#sgTBox').style.display=MEN.sigMode==='text'?'':'none';$('#sgIBox').style.display=MEN.sigMode==='img'?'':'none';
@@ -834,7 +845,7 @@ function mentorForm(){
   $('#audFile').onchange=e=>{const f=e.target.files[0];if(!f)return;if(f.size>15e6){toast('الملف أكبر من ١٥ م.ب');return}putAudio(f,f.name);e.target.value=''};
   $('#recBtn').onclick=async()=>{
     if(MEN.rec){MEN.rec.stop();return}
-    if(!navigator.mediaDevices||!window.MediaRecorder){toast('التسجيل غير مدعوم في هذا المتصفح؛ ارفعي ملفاً صوتياً بدلاً منه.',4000);return}
+    if(!navigator.mediaDevices||!window.MediaRecorder){toast('التسجيل غير مدعوم في هذا المتصفح؛ ارفع ملفاً صوتياً بدلاً منه.',4000);return}
     let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast('لم يُسمح باستخدام الميكروفون.',3500);return}
     const type=['audio/webm','audio/mp4','audio/ogg'].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
     const rec=new MediaRecorder(stream,type?{mimeType:type}:undefined),ch=[];MEN.rec=rec;const t0=Date.now();
@@ -855,14 +866,14 @@ function mentorForm(){
 function mentorPayload(){return{mode:MEN.mode,audio:MEN.mode==='voice'?MEN.audio:'',name:$('#mName').value.trim(),role:$('#mRole').value.trim(),body:$('#mBody').value.trim(),sig_text:MEN.sigMode==='text'?$('#mSig').value.trim():'',sig_url:MEN.sigMode==='img'?MEN.sigUrl:''}}
 async function mentorSave(pub){
   const m=$('#mMsg2'),w=mentorPayload();
-  if(MEN.rec){m.className='msg err';m.textContent='أوقفي التسجيل أولاً.';return}
-  if(pub&&w.mode==='voice'&&!w.audio){m.className='msg err';m.textContent='سجّلي الكلمة الصوتية أو ارفعي ملفاً قبل النشر.';return}
-  if(pub&&w.mode==='text'&&!w.body){m.className='msg err';m.textContent='اكتبي نص الكلمة قبل النشر.';$('#mBody').focus();return}
+  if(MEN.rec){m.className='msg err';m.textContent='أوقف التسجيل أولاً.';return}
+  if(pub&&w.mode==='voice'&&!w.audio){m.className='msg err';m.textContent='سجّل الكلمة الصوتية أو ارفع ملفاً قبل النشر.';return}
+  if(pub&&w.mode==='text'&&!w.body){m.className='msg err';m.textContent='اكتب نص الكلمة قبل النشر.';$('#mBody').focus();return}
   if(pub&&!confirm('ستظهر الكلمة للزوار في المعرض الافتراضي باسم مؤسستك. نشر الآن؟'))return;
   m.className='msg';m.textContent=pub?'جارٍ النشر…':'جارٍ الحفظ…';
   const bs=document.querySelectorAll('#menBody .btns .b');bs.forEach(b=>b.disabled=true);
   try{await rpc('book_mentor_save',{p_org:MEN.org,p_code:MEN.code,p_payload:w,p_publish:pub});
-    m.className='msg ok';m.textContent=pub?'نُشرت الكلمة. ستجدينها في صفحة مؤسستك.':'حُفظت المسودة. يمكنك العودة لاحقاً بالرمز نفسه.';
+    m.className='msg ok';m.textContent=pub?'نُشرت الكلمة. ستجدها في صفحة مؤسستك.':'حُفظت المسودة. يمكنك العودة لاحقاً بالرمز نفسه.';
     if(pub){const org=MEN.org;await reload();setTimeout(()=>{closeOv('menOv');const p=PAGES.findIndex(x=>x.t==='word'&&x.org===org);if(p>=0)goPage(p)},800)}
   }catch(e){m.className='msg err';m.textContent=errMsg(e)}
   finally{bs.forEach(b=>b.disabled=false)}
@@ -872,7 +883,7 @@ async function mentorSave(pub){
 let REC=null;
 async function recAudio(btn,lab,done){
   if(REC){REC.stop();return}
-  if(!navigator.mediaDevices||!window.MediaRecorder){toast('التسجيل غير مدعوم في هذا المتصفح؛ ارفعي ملفاً صوتياً بدلاً منه.',4000);return}
+  if(!navigator.mediaDevices||!window.MediaRecorder){toast('التسجيل غير مدعوم في هذا المتصفح؛ ارفع ملفاً صوتياً بدلاً منه.',4000);return}
   let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast('لم يُسمح باستخدام الميكروفون.',3500);return}
   const type=['audio/webm','audio/mp4','audio/ogg'].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
   const rec=new MediaRecorder(stream,type?{mimeType:type}:undefined),ch=[];REC=rec;const t0=Date.now();
@@ -894,7 +905,7 @@ function openAdmin(){openOv('admOv');if(ADM.pass){admLoad();return}
 async function admLoad(){try{ADM.d=await rpc('book_admin_get',{p_pass:ADM.pass});admRender()}catch(e){toast(errMsg(e))}}
 async function admCall(fn,args,okMsg){try{const r=await rpc(fn,Object.assign({p_pass:ADM.pass},args));if(okMsg)toast(okMsg);await admLoad();await reload();return r}catch(e){toast(errMsg(e),4000);throw e}}
 function admRender(){
-  const d=ADM.d,tabs=[['acts','الأنشطة'],['orgs','المؤسسات'],['head','كلمة رئيس القسم'],['coord','كلمة منسق البرنامج'],['acad','كلمة المشرفة الأكاديمية'],['students','كلمة الطالبات للمؤسسات'],['codes','رموز الأخصائيات'],['demo','المحتوى التجريبي']];
+  const d=ADM.d,tabs=[['acts','الأنشطة'],['orgs','المؤسسات'],['head','كلمة رئيس القسم'],['coord','كلمة منسق البرنامج'],['acad','كلمة المشرفة الأكاديمية'],['students','كلمة الطالبات للمؤسسات'],['codes','رموز الأخصائيات'],['visits','الزيارات'],['demo','المحتوى التجريبي']];
   $('#admBody').innerHTML='<div class="tabs" role="tablist">'+tabs.map(t=>'<button role="tab" data-tab="'+t[0]+'" class="'+(ADM.tab===t[0]?'on':'')+'" aria-selected="'+(ADM.tab===t[0])+'">'+t[1]+'</button>').join('')+'</div><div id="admTab"></div>';
   $('#admBody .tabs').onclick=e=>{const b=e.target.closest('[data-tab]');if(b){ADM.tab=b.dataset.tab;ADM.edit=null;admRender()}};
   const T=$('#admTab'),orgNames=(d.orgs||[]).map(o=>o.org);
@@ -913,15 +924,15 @@ function admRender(){
     (d.orgs||[]).forEach((o,i)=>{x+='<div class="it" style="display:grid;gap:8px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b>'+esc(o.org)+'</b>'+(o.is_demo?'<span class="tag dm">تجريبي</span>':'')+'<label class="note"><input type="checkbox" data-pubo="'+i+'" '+(o.published?'checked':'')+'> منشورة</label><label class="note">الترتيب <input type="number" data-sort="'+i+'" value="'+(o.sort||0)+'" style="width:64px"></label></div><div class="f"><textarea data-bio="'+i+'" rows="3" placeholder="نبذة قصيرة عن المؤسسة">'+esc(o.bio||'')+'</textarea></div><div class="btns"><button class="b p" data-save="'+i+'">حفظ</button></div></div>'});
     T.innerHTML=x+'</div><div class="f" style="margin-top:16px"><label>إضافة مؤسسة<input id="oNew" maxlength="120" placeholder="اسم المؤسسة"></label><div class="btns"><button class="b" id="oAdd">إضافة</button></div></div>';
     T.onclick=e=>{const b=e.target.closest('[data-save]');if(b){const i=+b.dataset.save,o=d.orgs[i];admCall('book_org_save',{p_org:o.org,p_bio:T.querySelector('[data-bio="'+i+'"]').value,p_published:T.querySelector('[data-pubo="'+i+'"]').checked,p_sort:+T.querySelector('[data-sort="'+i+'"]').value||0},'حُفظت المؤسسة').catch(()=>{})}};
-    $('#oAdd').onclick=()=>{const n=$('#oNew').value.trim();if(n)admCall('book_org_save',{p_org:n,p_bio:'',p_published:false,p_sort:(d.orgs||[]).length+1},'أُضيفت. اكتبي النبذة ثم انشريها.').catch(()=>{})};
+    $('#oAdd').onclick=()=>{const n=$('#oNew').value.trim();if(n)admCall('book_org_save',{p_org:n,p_bio:'',p_published:false,p_sort:(d.orgs||[]).length+1},'أُضيفت. اكتب النبذة ثم انشرها.').catch(()=>{})};
   }else if(ADM.tab==='head'||ADM.tab==='coord'||ADM.tab==='acad'||ADM.tab==='students'){
     const who=ADM.tab,ol=d.orgs||[];let W,H;
     if(who==='students'){if(!ol.some(o=>o.org===ADM.sorg))ADM.sorg=(ol[0]||{}).org;W=SW;H=((ol.find(o=>o.org===ADM.sorg)||{}).student_word)||{}}else{W=WHO[who];H=d[who]||{}}
     const NH=Object.assign({},H);
-    T.innerHTML=(who==='students'?'<div class="f" style="margin-bottom:14px"><p class="note" style="margin:0;color:var(--danger)">قبل النشر: تأكدي من موافقة الطالبات كتابةً على نشر أصواتهن أو صورهن، ومن موافقة المؤسسة. لا تُذكر أسماء الطالبات؛ تُنشر الكلمة باسم «طالبات التدريب الميداني».</p><label>المؤسسة<select id="sOrg">'+ol.map(o=>'<option '+(o.org===ADM.sorg?'selected':'')+'>'+esc(o.org)+'</option>').join('')+'</select></label></div>':'')+
+    T.innerHTML=(who==='students'?'<div class="f" style="margin-bottom:14px"><p class="note" style="margin:0;color:var(--danger)">قبل النشر: تأكد من موافقة الطالبات كتابةً على نشر أصواتهن أو صورهن، ومن موافقة المؤسسة. لا تُذكر أسماء الطالبات؛ تُنشر الكلمة باسم «طالبات التدريب الميداني».</p><label>المؤسسة<select id="sOrg">'+ol.map(o=>'<option '+(o.org===ADM.sorg?'selected':'')+'>'+esc(o.org)+'</option>').join('')+'</select></label></div>':'')+
      '<div class="f"><div class="row2"><label>الاسم<input id="hName" value="'+esc(H.name||'')+'" placeholder="'+esc(W.sig||'')+'"></label><label>الصفة<input id="hRole" value="'+esc(H.role||'')+'"></label></div>'+
      '<label>عنوان الصفحة<input id="hTitle" value="'+esc(H.title_line||W.title)+'"></label>'+
-     '<p class="note" style="margin:0">الكلمة يمكن أن تكون <b>مكتوبة</b> أو <b>صوتية</b> أو <b>فيديو</b>، أو أكثر من نوع معاً. املئي ما يلزم فقط.</p>'+
+     '<p class="note" style="margin:0">الكلمة يمكن أن تكون <b>مكتوبة</b> أو <b>صوتية</b> أو <b>فيديو</b>، أو أكثر من نوع معاً. املأ ما يلزم فقط.</p>'+
      '<fieldset style="border:1px solid var(--line);border-radius:12px;padding:12px"><legend class="note">١. كلمة مكتوبة</legend><textarea id="hBody" rows="5" style="width:100%">'+esc(H.body||'')+'</textarea></fieldset>'+
      '<fieldset style="border:1px solid var(--line);border-radius:12px;padding:12px" class="f"><legend class="note">٢. كلمة صوتية</legend>'+
        '<div class="btns" style="margin:0;align-items:center"><button type="button" class="b p" id="hRec">● تسجيل</button><span class="note" id="hRecT"></span><label class="b" style="display:inline-flex;cursor:pointer">رفع ملف صوتي<input type="file" id="hAud" accept="audio/*" style="display:none"></label><button type="button" class="b d" id="hAudDel">حذف الصوت</button></div><div id="hAudP"></div></fieldset>'+
@@ -931,24 +942,39 @@ function admRender(){
      '<label class="note"><input type="checkbox" id="hPub" '+(H.published!==false?'checked':'')+'> منشورة للزوار</label><div class="btns"><button class="b p" id="hSave">حفظ</button></div></div>';
     const st8=()=>{$('#hVidN').textContent=NH.video?'مرفوع ✓':'لا يوجد';$('#hPosN').textContent=NH.poster?'مرفوعة ✓':'لا يوجد';$('#hCapN').textContent=NH.captions?'مرفوع ✓':'لا يوجد';$('#hVidDel').style.display=NH.video?'':'none';
       $('#hAudDel').style.display=NH.audio?'':'none';$('#hAudP').innerHTML=NH.audio?'<audio controls src="'+esc(NH.audio)+'" style="width:100%"></audio>':'<span class="note">لا يوجد صوت.</span>'};
-    const up=(id,key,folder)=>{$('#'+id).onchange=async e=>{const f=e.target.files[0];if(!f)return;const n=$('#'+id+'N')||$('#hRecT');n.textContent='جارٍ الرفع…';try{NH[key]=await upload(f,folder||'head');st8();n.textContent='رُفع ✓ (اضغطي حفظ لتثبيته)'}catch(er){n.textContent=errMsg(er)}e.target.value=''}};
+    const up=(id,key,folder)=>{$('#'+id).onchange=async e=>{const f=e.target.files[0];if(!f)return;const n=$('#'+id+'N')||$('#hRecT');n.textContent='جارٍ الرفع…';try{NH[key]=await upload(f,folder||'head');st8();n.textContent='رُفع ✓ (اضغط حفظ لتثبيته)'}catch(er){n.textContent=errMsg(er)}e.target.value=''}};
     up('hVid','video');up('hPos','poster');up('hCap','captions');up('hAud','audio','voice');
     $('#hVidDel').onclick=()=>{NH.video=NH.poster=NH.captions='';st8()};$('#hAudDel').onclick=()=>{NH.audio='';st8()};
-    $('#hRec').onclick=()=>recAudio($('#hRec'),$('#hRecT'),async b=>{$('#hRecT').textContent='جارٍ الرفع…';try{NH.audio=await upload(b,'voice');$('#hRecT').textContent='رُفع ✓ (اضغطي حفظ لتثبيته)';st8()}catch(er){$('#hRecT').textContent=errMsg(er)}});
+    $('#hRec').onclick=()=>recAudio($('#hRec'),$('#hRecT'),async b=>{$('#hRecT').textContent='جارٍ الرفع…';try{NH.audio=await upload(b,'voice');$('#hRecT').textContent='رُفع ✓ (اضغط حفظ لتثبيته)';st8()}catch(er){$('#hRecT').textContent=errMsg(er)}});
     st8();
     $('#hSave').onclick=()=>{Object.assign(NH,{name:$('#hName').value.trim(),role:$('#hRole').value.trim(),title_line:$('#hTitle').value.trim(),body:$('#hBody').value.trim(),published:$('#hPub').checked,is_demo:false});
       if(who==='students')admCall('book_student_word_save',{p_org:ADM.sorg,p_json:JSON.stringify(NH)},'حُفظت كلمة الطالبات').catch(()=>{});
       else admCall({coord:'book_coord_save',acad:'book_acad_save'}[who]||'book_head_save',{p_json:JSON.stringify(NH)},'حُفظت '+W.row).catch(()=>{})};
     if(who==='students')$('#sOrg').onchange=e=>{ADM.sorg=e.target.value;admRender()};
+  }else if(ADM.tab==='visits'){
+    const me=(()=>{try{return localStorage.getItem('galMe')==='1'}catch(e){return false}})();
+    T.innerHTML='<p class="note">الأرقام لزوار المعرض والقاعة معاً، بلا أي بيانات شخصية: كل متصفح يُحسب جهازاً واحداً. '+(me?'<b style="color:#2d6a3e">هذا الجهاز مستثنى من العدّ.</b>':'<b style="color:var(--danger)">هذا الجهاز ما زال يُحسب.</b> لاستثنائه افتح الموقع منه مرة واحدة مع <code>?me=1</code>.')+'</p><div id="vStats" class="note">جارٍ التحميل…</div>';
+    rpc('gallery_visits_stats',{p_pass:ADM.pass}).then(s=>{s=s||{};const days=s.by_day||[];
+      const card=(n,l)=>'<div class="it" style="flex-direction:column;align-items:flex-start;gap:2px"><b style="font-size:26px;min-width:0">'+AR(n||0)+'</b><small>'+l+'</small></div>';
+      $('#vStats').innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:12px 0">'+card(s.devices_total,'جهازاً منذ البداية')+card(s.visits_total,'مرة فُتح فيها')+card(s.devices_7d,'جهازاً آخر ٧ أيام')+card(s.devices_today,'جهازاً اليوم')+'</div>'+
+        (s.last_visit?'<p class="note">آخر زيارة: '+new Date(s.last_visit).toLocaleString('ar-QA')+'</p>':'')+
+        '<div class="lst">'+days.map(x=>'<div class="it"><b style="min-width:120px">'+new Date(x.day+'T00:00:00').toLocaleDateString('ar-QA',{weekday:'long',day:'numeric',month:'long'})+'</b><span class="tag">'+AR(x.devices)+' جهاز</span><span class="tag">'+AR(x.opens)+' مرة</span></div>').join('')+'</div>'})
+      .catch(e=>{$('#vStats').textContent=errMsg(e)});
   }else if(ADM.tab==='codes'){
     const ws={};(d.words||[]).forEach(w=>ws[w.org]=w);
-    let x='<p class="note">سلّمي كل مؤسسة رمزها عبر قناة رسمية. الرمز يتيح للأخصائيات كتابة أو تسجيل كلمة مؤسستهن فقط، وإعادة التوليد تُبطل الرمز القديم.</p><div class="lst">';
+    let x='<h3 style="margin:0 0 6px;font:600 15px Noto Kufi Arabic">روابط رفع كلمات الافتتاح</h3><p class="note">أرسلي لكل منهما رابطه الخاص؛ يفتحه فتظهر له نافذة الرفع مباشرة (نص أو فيديو) دون أي رمز أو كلمة مرور. «رابط جديد» يُبطل الرابط القديم.</p><div class="lst" id="leadCodes"><span class="note">جارٍ التحميل…</span></div>'+
+      '<h3 style="margin:18px 0 6px;font:600 15px Noto Kufi Arabic">رموز المؤسسات</h3><p class="note">سلّمي كل مؤسسة رمزها عبر قناة رسمية. الرمز يتيح للأخصائيات كتابة أو تسجيل كلمة مؤسستهن فقط، وإعادة التوليد تُبطل الرمز القديم.</p><div class="lst">';
+    const leadURL=(k,c)=>'https://social.assessment.work/?lead='+k+'&k='+c;
+    const drawLead=c=>{$('#leadCodes').innerHTML=['head','coord'].map(k=>'<div class="it" style="display:grid;gap:6px"><b>'+WHO[k].row+'</b><input readonly dir="ltr" value="'+esc(leadURL(k,c[k]||''))+'" style="border:1px solid var(--line);border-radius:8px;padding:8px;font-size:13px;width:100%" onclick="this.select()"><div class="btns" style="margin:0"><button class="b p" data-lcopy="'+esc(leadURL(k,c[k]||''))+'">نسخ الرابط</button><button class="b" data-lreset="'+k+'">رابط جديد</button></div></div>').join('')};
+    rpc('book_lead_codes',{p_pass:ADM.pass}).then(drawLead).catch(e=>{$('#leadCodes').textContent=errMsg(e)});
+    setTimeout(()=>{const lc=$('#leadCodes');if(lc)lc.onclick=e=>{const cp=e.target.closest('[data-lcopy]');if(cp){navigator.clipboard&&navigator.clipboard.writeText(cp.dataset.lcopy).then(()=>toast('نُسخ الرابط'),()=>toast('حدّدي الرابط وانسخيه يدوياً'));return}
+      const b=e.target.closest('[data-lreset]');if(b&&confirm('إنشاء رابط جديد؟ يتوقف الرابط القديم عن العمل.'))rpc('book_lead_codes',{p_pass:ADM.pass,p_reset:b.dataset.lreset}).then(c=>{drawLead(c);toast('أُنشئ رابط جديد')}).catch(er=>toast(errMsg(er)))}},0);
     (d.codes||[]).forEach(c=>{const w=ws[c.org];x+='<div class="it"><b>'+esc(c.org)+'</b><code style="font-size:16px;letter-spacing:2px">'+esc(c.code)+'</code>'+(w&&w.published?'<span class="tag pub">كلمة منشورة</span>':w&&w.has_draft?'<span class="tag">مسودة</span>':'<span class="tag">لا كلمة</span>')+'<button class="b" data-reset="'+esc(c.org)+'">رمز جديد</button>'+(w&&w.published?'<button class="b d" data-hide="'+esc(c.org)+'">إخفاء الكلمة</button>':'')+'</div>'});
     T.innerHTML=x+'</div>';
     T.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.reset&&confirm('توليد رمز جديد لـ'+b.dataset.reset+'؟'))admCall('book_code_reset',{p_org:b.dataset.reset},'تم توليد رمز جديد').catch(()=>{});else if(b.dataset.hide&&confirm('إخفاء الكلمة المنشورة؟ تبقى مسودتها لدى الأخصائيات.'))admCall('book_word_hide',{p_org:b.dataset.hide},'أُخفيت الكلمة').catch(()=>{})};
   }else{
     const nd=(d.activities||[]).filter(a=>a.is_demo).length,no=(d.orgs||[]).filter(o=>o.is_demo).length;
-    T.innerHTML='<p class="note">المحتوى التجريبي الحالي: '+AR(no)+' مؤسسات، و'+AR(nd)+' أنشطة، وكلمات مشرفات تجريبية، وفيديو تجريبي لكلمة رئيس القسم. عند جاهزية المواد الحقيقية احذفيه بضغطة واحدة. أي عنصر تعدّلينه يتحوّل إلى محتوى حقيقي ولا يُحذف.</p><div class="btns"><button class="b d" id="purge">حذف كل المحتوى التجريبي</button></div>';
+    T.innerHTML='<p class="note">المحتوى التجريبي الحالي: '+AR(no)+' مؤسسات، و'+AR(nd)+' أنشطة، وكلمات مشرفات تجريبية، وفيديو تجريبي لكلمة رئيس القسم. عند جاهزية المواد الحقيقية احذفه بضغطة واحدة. أي عنصر تعدّله يتحوّل إلى محتوى حقيقي ولا يُحذف.</p><div class="btns"><button class="b d" id="purge">حذف كل المحتوى التجريبي</button></div>';
     $('#purge').onclick=()=>{if(confirm('حذف كل المحتوى التجريبي نهائياً؟ لا يمكن التراجع.'))admCall('book_purge_demo',{},'حُذف المحتوى التجريبي').catch(()=>{})};
   }
 }
@@ -969,6 +995,47 @@ function admActForm(T,a,orgNames){
   $('#eBack').onclick=()=>{ADM.edit=null;admRender()};
   $('#eSave').onclick=async()=>{const t=$('#eTitle').value.trim();if(!t){$('#eMsg').className='msg err';$('#eMsg').textContent='العنوان مطلوب.';return}
     try{await admCall('book_activity_save',{p_id:a.id||null,p_org:$('#eOrg').value,p_title:t,p_kind:$('#eKind').value,p_goal:$('#eGoal').value,p_did:$('#eDid').value,p_learned:$('#eLearn').value,p_media:media,p_published:$('#ePub').checked,p_sort:+$('#eSort').value||0},'حُفظ النشاط');ADM.edit=null;admRender()}catch(e){}};
+}
+
+/* ===== head of department / coordinator upload their own word with a personal code ===== */
+const LEAD={head:{btn:'لرئيس القسم: إضافة الكلمة أو تعديلها'},coord:{btn:'لمنسق البرنامج: إضافة الكلمة أو تعديلها'}};
+function openLead(who){
+  const W=WHO[who];$('#menTtl').textContent=W.row;$('#menOv header small').textContent='رفع الكلمة';
+  const saved=sget('lcode:'+who);
+  $('#menBody').innerHTML='<div class="f"><p class="note" style="margin:0">أدخل رمزك الشخصي المكوّن من ٦ أرقام. يمكن أن تكون الكلمة مكتوبة أو فيديو أو الاثنين معاً.</p>'+
+    '<label>الرمز<input id="lCode" inputmode="numeric" maxlength="6" value="'+esc(saved||'')+'"></label><div class="msg" id="lMsg" aria-live="polite"></div><div class="btns"><button class="b p" id="lGo">دخول</button></div></div>';
+  openOv('menOv');
+  const go=async()=>{const code=$('#lCode').value.trim(),m=$('#lMsg');if(!/^\d{6}$/.test(code)){m.className='msg err';m.textContent='الرمز ٦ أرقام.';return}
+    m.className='msg';m.textContent='جارٍ التحقق…';
+    try{const H=await rpc('book_lead_get',{p_who:who,p_code:code});sset('lcode:'+who,code);leadForm(who,code,H||{})}catch(e){m.className='msg err';m.textContent=errMsg(e)}};
+  $('#lGo').onclick=go;$('#lCode').onkeydown=e=>{if(e.key==='Enter')go()};setTimeout(()=>$('#lCode').focus(),60);
+}
+function leadForm(who,code,H){
+  const W=WHO[who],NH=Object.assign({},H);
+  $('#menBody').innerHTML='<div class="f">'+
+    '<div class="row2"><label>الاسم<input id="lName" maxlength="80" value="'+esc(H.name||'')+'"></label><label>الصفة<input id="lRole" maxlength="120" value="'+esc(H.role||'')+'"></label></div>'+
+    '<label>عنوان الصفحة<input id="lTitle" maxlength="120" value="'+esc(H.title_line||W.title)+'"></label>'+
+    '<fieldset style="border:1px solid var(--line);border-radius:12px;padding:12px"><legend class="note">كلمة مكتوبة</legend><textarea id="lBody" rows="6" style="width:100%">'+esc(H.body||'')+'</textarea></fieldset>'+
+    '<fieldset style="border:1px solid var(--line);border-radius:12px;padding:12px" class="f"><legend class="note">كلمة فيديو</legend>'+
+      '<div class="row2"><label>الفيديو (MP4 حتى ٨٠ م.ب)<input type="file" id="lVid" accept="video/mp4,video/webm,video/quicktime"><small class="note" id="lVidN"></small></label><label>صورة غلاف (اختياري)<input type="file" id="lPos" accept="image/*"><small class="note" id="lPosN"></small></label></div>'+
+      '<label>ملف ترجمة نصية ‎.vtt (اختياري)<input type="file" id="lCap" accept=".vtt,text/vtt"><small class="note" id="lCapN"></small></label>'+
+      '<div id="lVidP"></div><div class="btns" style="margin:0"><button type="button" class="b d" id="lVidDel">حذف الفيديو</button></div></fieldset>'+
+    '<label class="note"><input type="checkbox" id="lPub" '+(H.published!==false?'checked':'')+'> تظهر للزوار</label>'+
+    '<div class="msg" id="lMsg2" aria-live="polite"></div><div class="btns"><button class="b p" id="lSave">حفظ ونشر</button></div></div>';
+  const st8=()=>{$('#lVidN').textContent=NH.video?'مرفوع ✓':'لا يوجد';$('#lPosN').textContent=NH.poster?'مرفوعة ✓':'لا يوجد';$('#lCapN').textContent=NH.captions?'مرفوع ✓':'لا يوجد';
+    $('#lVidDel').style.display=NH.video?'':'none';$('#lVidP').innerHTML=NH.video?'<video controls playsinline preload="metadata" src="'+esc(NH.video)+'" style="width:100%;max-height:240px;background:#000;border-radius:8px"></video>':''};
+  const up=(id,key,max)=>{$('#'+id).onchange=async e=>{const f=e.target.files[0];if(!f)return;if(max&&f.size>max){toast('الملف أكبر من المسموح ('+AR(Math.round(max/1e6))+' م.ب)',4000);e.target.value='';return}
+    const n=$('#'+id+'N');n.textContent='جارٍ الرفع… قد يستغرق الفيديو دقيقة';$('#lSave').disabled=true;
+    try{NH[key]=await upload(f,'head');n.textContent='رُفع ✓';st8()}catch(er){n.textContent=errMsg(er)}finally{$('#lSave').disabled=false;e.target.value=''}}};
+  up('lVid','video',80e6);up('lPos','poster',8e6);up('lCap','captions',1e6);
+  $('#lVidDel').onclick=()=>{NH.video=NH.poster=NH.captions='';st8()};
+  $('#lSave').onclick=async()=>{const m=$('#lMsg2');
+    Object.assign(NH,{name:$('#lName').value.trim(),role:$('#lRole').value.trim(),title_line:$('#lTitle').value.trim(),body:$('#lBody').value.trim(),published:$('#lPub').checked});
+    if(NH.published&&!NH.body&&!NH.video&&!NH.audio){m.className='msg err';m.textContent='اكتب الكلمة أو ارفع فيديو قبل النشر.';return}
+    m.className='msg';m.textContent='جارٍ الحفظ…';
+    try{await rpc('book_lead_save',{p_who:who,p_code:code,p_payload:NH});m.className='msg ok';m.textContent='حُفظت الكلمة وظهرت في المعرض.';
+      await reload();setTimeout(()=>{closeOv('menOv');goPage(who==='head'?0:1)},800)}catch(e){m.className='msg err';m.textContent=errMsg(e)}};
+  st8();
 }
 
 /* ===== soft background music (generated, no file) + page sound ===== */
@@ -1026,7 +1093,7 @@ document.addEventListener('click',e=>{const x=e.target.closest('[data-close]');i
   if(e.target.classList&&e.target.classList.contains('ov'))closeOv(e.target.id)});
 function pageAction(e){if(e.target.closest('[data-open]')){goSpread(1);return}
   const a=e.target.closest('[data-act]');if(!a)return;e.preventDefault();const act=a.dataset.act;
-  if(act==='play')openVideo(a.dataset.who);else if(act==='jump')goOrg(a.dataset.org);else if(act==='act')openActivity(a.dataset.id);else if(act==='mentor')openMentor(a.dataset.org);
+  if(act==='play')openVideo(a.dataset.who);else if(act==='lead')openLead(a.dataset.who);else if(act==='jump')goOrg(a.dataset.org);else if(act==='act')openActivity(a.dataset.id);else if(act==='mentor')openMentor(a.dataset.org);
   else if(act==='word'){const p=PAGES.findIndex(x=>x.t==='word'&&x.org===a.dataset.org);if(p>=0)goPage(p)}}
 $('#overlay').addEventListener('click',pageAction);$('#simple').addEventListener('click',pageAction);
 document.addEventListener('keydown',e=>{
@@ -1062,7 +1129,7 @@ async function reload(){
   const ld=t=>$('#ldMsg').textContent=t;
   try{await Promise.race([Promise.all(['700 30px "Noto Kufi Arabic"','600 16px "Noto Kufi Arabic"','400 16px "IBM Plex Sans Arabic"','500 16px "IBM Plex Sans Arabic"','600 16px "IBM Plex Sans Arabic"','400 19px Amiri','700 60px Amiri','400 30px "Aref Ruqaa"'].map(f=>document.fonts.load(f))),new Promise(r=>setTimeout(r,3500))])}catch(e){}
   ld('جلب المواد المعتمدة للنشر');
-  try{DATA=await rpc('book_get')}catch(e){ld('تعذّر الاتصال بالخادم. أعيدي تحميل الصفحة.');return}
+  try{DATA=await rpc('book_get')}catch(e){ld('تعذّر الاتصال بالخادم. أعد تحميل الصفحة.');return}
   buildPages();buildToc();
   ld('تجهيز المشهد');
   const q=new URLSearchParams(location.search);
@@ -1082,7 +1149,28 @@ async function reload(){
     ['pointerdown','keydown','touchstart'].forEach(ev=>addEventListener(ev,kick,true));
   }
   window.__book={st,goSpread,goPage,goOrg,next,prev,get L(){return L},get PAGES(){return PAGES},three:()=>three};
+  visitPing();
+  // personal direct link: ?lead=head&k=xxxxxx opens the upload form straight away (nothing to type)
+  {const lw=new URLSearchParams(location.search).get('lead'),lk=new URLSearchParams(location.search).get('k');
+   if((lw==='head'||lw==='coord')&&lk){try{const H=await rpc('book_lead_get',{p_who:lw,p_code:lk});
+     goPage(lw==='head'?0:1);$('#menTtl').textContent=WHO[lw].row;$('#menOv header small').textContent='رفع الكلمة';openOv('menOv');leadForm(lw,lk,H||{});
+     try{history.replaceState(null,'',location.pathname)}catch(e){}
+   }catch(e){toast('الرابط غير صالح أو انتهت صلاحيته. اطلب رابطاً جديداً من المشرفة الأكاديمية.',5000)}}}
 })();
+
+/* ===== visit counter: random device id only, no personal data. ?me=1 marks this device as the owner's and erases its past visits ===== */
+async function visitPing(){
+  try{
+    let d=localStorage.getItem('galDev');
+    if(!d){d='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,10);localStorage.setItem('galDev',d)}
+    if(new URLSearchParams(location.search).get('me')==='1'){
+      localStorage.setItem('galMe','1');await rpc('gallery_visit_forget',{p_dev:d});
+      toast('تم: زياراتك من هذا الجهاز لن تُحسب بعد الآن.',4000);
+    }
+    if(localStorage.getItem('galMe')==='1')return;
+    await rpc('gallery_visit_ping',{p_dev:d});
+  }catch(e){}
+}
 </script>
 </body>
 </html>

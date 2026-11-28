@@ -282,7 +282,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
   <div class="brand"><span class="dot"></span><div><h1><span class="full">المعرض الافتراضي للتدريب الميداني</span><span class="short">المعرض الافتراضي</span></h1><small>قسم العلوم الاجتماعية · جامعة قطر</small></div></div>
   <span class="spacer"></span>
   <button class="tbtn" id="btnList" title="أقسام المعرض"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span class="lbl">الأقسام</span></button>
-  <button class="tbtn primary" id="btnAdd" title="أضيفي جناحك"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">أضيفي جناحك</span></button>
+  <button class="tbtn primary" id="btnAdd" title="أضف جناحك"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">أضف جناحك</span></button>
   <button class="tbtn" id="btnMenu" title="المزيد"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></svg></button>
 </div>
 
@@ -300,7 +300,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 </div>
 <div class="sup-tag" id="supTag">وضع المشرفة</div>
 
-<div id="hint">اسحبي للنظر حولك · الأسهم أو WASD للمشي · انقري على جناح لفتحه</div>
+<div id="hint">اسحب للنظر حولك · الأسهم أو WASD للمشي · انقر على جناح لفتحه</div>
 
 <div class="walkpad"><button id="padUp" aria-label="تقدّم">▲</button><button id="padDown" aria-label="تراجع">▼</button></div>
 
@@ -314,7 +314,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 <!-- مجسّم القاعة -->
 <section id="minimap" aria-label="مجسّم القاعة">
   <div class="mm-h">مُجسّم القاعة</div>
-  <div class="mm-s">انقري نقطة للانتقال إليها</div>
+  <div class="mm-s">انقر نقطة للانتقال إليها</div>
   <div class="mm-stage"><div class="mm-plane" id="mmPlane"><span class="mm-w mm-wl"></span><span class="mm-w mm-wr"></span><span class="mm-w mm-wf"></span><span class="mm-path"></span><div id="mmPins"></div><span class="mm-me" id="mmMe"></span></div></div>
 </section>
 
@@ -345,7 +345,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
     <div class="sec" id="shCommentsSec"><h3>دفتر الزوار <span id="shCount" style="color:var(--muted);font-weight:400"></span></h3><div class="comments" id="shComments"></div></div>
     <form class="composer" id="composer">
       <input id="cName" placeholder="اسمك (اختياري)" maxlength="80" autocomplete="name">
-      <textarea id="cBody" placeholder="اكتبي تعليقك أو كلمة تشجيع…" maxlength="1000"></textarea>
+      <textarea id="cBody" placeholder="اكتب تعليقك أو كلمة تشجيع…" maxlength="1000"></textarea>
       <div class="recprev" id="recPrev" hidden><audio id="recAudio" controls></audio><button type="button" class="btn ghost" id="recDiscard">حذف</button></div>
       <div class="row">
         <button type="button" class="btn rec" id="btnRec"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>تعليق صوتي</span></button>
@@ -359,7 +359,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 
 <!-- إضافة جناح -->
 <div class="ov" id="addOv"><div class="card">
-  <h2>أضيفي جناحك إلى المعرض</h2>
+  <h2>أضف جناحك إلى المعرض</h2>
   <div class="sub">بوستر أو فيديو (أو كلاهما) عن رحلتك التدريبية، مع أبرز الأنشطة وكلمة للمؤسسة.</div>
   <form id="addForm">
     <div class="grid2">
@@ -368,12 +368,12 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
     </div>
     <div class="f"><label>المؤسسة التدريبية *</label><select id="aOrg" required></select></div>
     <div class="f"><label>عنوان الرحلة</label><input id="aTitle" maxlength="120" placeholder="مثال: من الملاحظة إلى المشاركة"></div>
-    <div class="f"><label>رحلتي التدريبية</label><textarea id="aJourney" maxlength="1500" placeholder="ماذا تعلّمتِ؟ كيف تطوّرتِ خلال الأسابيع؟"></textarea></div>
-    <div class="f"><label>أبرز الأنشطة</label><textarea id="aHi" maxlength="1500" placeholder="أهم الأنشطة والبرامج التي شاركتِ فيها"></textarea></div>
+    <div class="f"><label>رحلتي التدريبية</label><textarea id="aJourney" maxlength="1500" placeholder="ماذا تعلّمت؟ كيف تطوّرت خلال الأسابيع؟"></textarea></div>
+    <div class="f"><label>أبرز الأنشطة</label><textarea id="aHi" maxlength="1500" placeholder="أهم الأنشطة والبرامج التي شاركت فيها"></textarea></div>
     <div class="f"><label>كلمة للمؤسسة</label><textarea id="aMsg" maxlength="1000" placeholder="كلمة شكر أو رسالة للمؤسسة والمشرفة الميدانية"></textarea></div>
     <div class="grid2">
-      <div class="f"><label>البوستر (صورة)</label><div class="drop" id="dropPoster">اضغطي لاختيار صورة</div><input type="file" id="aPoster" accept="image/*" hidden></div>
-      <div class="f"><label>الفيديو (حتى ٤٠ م.ب)</label><div class="drop" id="dropVideo">اضغطي لاختيار فيديو</div><input type="file" id="aVideo" accept="video/mp4,video/webm,video/quicktime" hidden></div>
+      <div class="f"><label>البوستر (صورة)</label><div class="drop" id="dropPoster">اضغط لاختيار صورة</div><input type="file" id="aPoster" accept="image/*" hidden></div>
+      <div class="f"><label>الفيديو (حتى ٤٠ م.ب)</label><div class="drop" id="dropVideo">اضغط لاختيار فيديو</div><input type="file" id="aVideo" accept="video/mp4,video/webm,video/quicktime" hidden></div>
     </div>
     <div class="prog" id="addProg"><i></i></div>
     <div class="note" id="addNote"></div>
@@ -383,7 +383,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 
 <!-- قائمة الأجنحة -->
 <div class="ov" id="listOv"><div class="card">
-  <h2>أقسام المعرض</h2><div class="sub">اختاري قسمًا للانتقال إليه مباشرة</div>
+  <h2>أقسام المعرض</h2><div class="sub">اختر قسمًا للانتقال إليه مباشرة</div>
   <div class="list" id="boothList"></div>
   <div class="actions"><button type="button" class="btn ghost" id="listClose">إغلاق</button></div>
 </div></div>
@@ -392,15 +392,15 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
 <div class="ov" id="zoomOv"><img id="zoomImg" alt="البوستر"></div>
 
 <div class="ov" id="guideOv"><div class="card" style="max-width:460px">
-  <h2>أهلًا بكِ في المعرض</h2>
+  <h2>أهلًا بك في المعرض</h2>
   <div class="sub">أربع خطوات تكفي للتجوّل</div>
   <div class="gsteps">
-    <div class="gstep"><span class="gi"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span><div><b>تنقّلي بين الأقسام</b><p>زرّا «السابق» و«التالي» في الأسفل يمرّان على كل لوحة وجناح بالترتيب.</p></div></div>
-    <div class="gstep"><span class="gi"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><div><b>أو اقفزي مباشرة</b><p>زر «الأقسام» يعرض فهرس المعرض كاملًا — انقري أي قسم للوصول إليه.</p></div></div>
-    <div class="gstep"><span class="gi"><svg viewBox="0 0 24 24"><path d="M6 4l13 8-13 8z"/></svg></span><div><b>جولة تلقائية</b><p>زر التشغيل ▶ يلفّ بكِ على المعرض كله ويفتح محتوى كل قسم.</p></div></div>
-    <div class="gstep"><span class="gi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></span><div><b>انظري حولك</b><p>اسحبي بإصبعك للنظر، أو انقري أي لوحة أو بوستر لفتحه.</p></div></div>
+    <div class="gstep"><span class="gi"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span><div><b>تنقّل بين الأقسام</b><p>زرّا «السابق» و«التالي» في الأسفل يمرّان على كل لوحة وجناح بالترتيب.</p></div></div>
+    <div class="gstep"><span class="gi"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><div><b>أو اقفز مباشرة</b><p>زر «الأقسام» يعرض فهرس المعرض كاملًا — انقر أي قسم للوصول إليه.</p></div></div>
+    <div class="gstep"><span class="gi"><svg viewBox="0 0 24 24"><path d="M6 4l13 8-13 8z"/></svg></span><div><b>جولة تلقائية</b><p>زر التشغيل ▶ يلفّ بك على المعرض كله ويفتح محتوى كل قسم.</p></div></div>
+    <div class="gstep"><span class="gi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></span><div><b>انظر حولك</b><p>اسحب بإصبعك للنظر، أو انقر أي لوحة أو بوستر لفتحه.</p></div></div>
   </div>
-  <div class="actions"><button type="button" class="btn" id="guideTour">ابدئي الجولة التلقائية</button><button type="button" class="btn ghost" id="guideClose">أتصفّح بنفسي</button></div>
+  <div class="actions"><button type="button" class="btn" id="guideTour">ابدأ الجولة التلقائية</button><button type="button" class="btn ghost" id="guideClose">أتصفّح بنفسي</button></div>
 </div></div>
 
 <div class="ov" id="statsOv"><div class="card" style="max-width:520px">
@@ -424,8 +424,8 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
       <div class="f"><label>الاسم <span class="note">(اختياري)</span></label><input id="mName" maxlength="80" placeholder="يُترك فارغًا للنشر باسم الجهة"></div>
       <div class="f"><label>المسمى الوظيفي</label><input id="mRole" maxlength="120" placeholder="أخصائية اجتماعية · مشرفة ميدانية"></div>
     </div>
-    <div class="f"><label>الكلمة *</label><textarea id="mBody" required maxlength="2000" style="min-height:130px" placeholder="أداء الطالبات في المؤسسة، وأبرز ما أسهمن به، وما تقترحينه على القسم لتطوير التدريب."></textarea></div>
-    <div class="f"><label>صورة (اختياري)</label><div class="drop" id="dropMPhoto">اضغطي لاختيار صورة</div><input type="file" id="mPhoto" accept="image/*" hidden></div>
+    <div class="f"><label>الكلمة *</label><textarea id="mBody" required maxlength="2000" style="min-height:130px" placeholder="أداء الطالبات في المؤسسة، وأبرز ما أسهمن به، وما تقترحه على القسم لتطوير التدريب."></textarea></div>
+    <div class="f"><label>صورة (اختياري)</label><div class="drop" id="dropMPhoto">اضغط لاختيار صورة</div><input type="file" id="mPhoto" accept="image/*" hidden></div>
     <div class="prog" id="mentorProg"><i></i></div>
     <div class="note" id="mentorNote"></div>
     <div class="actions"><button type="submit" class="btn" id="mentorSubmit">نشر الكلمة</button><button type="button" class="btn ghost" id="mentorCancel">إلغاء</button></div>
@@ -450,8 +450,8 @@ button,input,textarea,select{font-family:inherit;font-size:inherit}
     </div>
     <div class="f"><label>نص الكلمة</label><textarea id="hText" maxlength="6000" style="min-height:120px"></textarea></div>
     <div class="grid2">
-      <div class="f"><label>فيديو الكلمة (حتى ٨٠ م.ب)</label><div class="drop" id="dropHVideo">اضغطي لاختيار فيديو</div><input type="file" id="hVideo" accept="video/mp4,video/webm,video/quicktime" hidden></div>
-      <div class="f"><label>صورة شخصية (اختياري)</label><div class="drop" id="dropHPhoto">اضغطي لاختيار صورة</div><input type="file" id="hPhoto" accept="image/*" hidden></div>
+      <div class="f"><label>فيديو الكلمة (حتى ٨٠ م.ب)</label><div class="drop" id="dropHVideo">اضغط لاختيار فيديو</div><input type="file" id="hVideo" accept="video/mp4,video/webm,video/quicktime" hidden></div>
+      <div class="f"><label>صورة شخصية (اختياري)</label><div class="drop" id="dropHPhoto">اضغط لاختيار صورة</div><input type="file" id="hPhoto" accept="image/*" hidden></div>
     </div>
     <div class="prog" id="headProg"><i></i></div>
     <div class="note" id="headNote"></div>
@@ -606,7 +606,7 @@ function stageTexture(){
 
     if(head&&(head.video_url||head.text)){
       g.font='500 38px "Noto Kufi Arabic"';
-      const cta=head.video_url?'انقري لمشاهدة الكلمة':'انقري لقراءة الكلمة', cw=g.measureText(cta).width+112;
+      const cta=head.video_url?'انقر لمشاهدة الكلمة':'انقر لقراءة الكلمة', cw=g.measureText(cta).width+112;
       g.fillStyle='rgba(201,169,106,.22)'; rrect(g,R-cw,560,cw,78,39); g.fill();
       g.strokeStyle='rgba(201,169,106,.78)'; g.lineWidth=2.4; g.stroke();
       g.fillStyle='#E9D9B4'; g.fillText(cta,R-82,608);
@@ -653,7 +653,7 @@ function openHead(){
   $('shMsgSec').hidden=!head?.text; $('shMsg').textContent=head?.text||''; $('shMsgSec').querySelector('h3').textContent='نص الكلمة';
   if(!head||(!head.text&&!head.video_url)){$('shMsgSec').hidden=false;$('shMsg').textContent='لم تُضَف كلمة رئيس القسم بعد.';}
   const hact=$('shActions'); hact.innerHTML='';
-  if(supPass){$('shActionsSec').hidden=false;const hb=document.createElement('button');hb.className='btn';hb.textContent=(head&&(head.text||head.video_url))?'تعديل الكلمة':'أضيفي كلمة رئيس القسم';hb.onclick=()=>$('btnEditHead').click();hact.appendChild(hb);}
+  if(supPass){$('shActionsSec').hidden=false;const hb=document.createElement('button');hb.className='btn';hb.textContent=(head&&(head.text||head.video_url))?'تعديل الكلمة':'أضف كلمة رئيس القسم';hb.onclick=()=>$('btnEditHead').click();hact.appendChild(hb);}
   else $('shActionsSec').hidden=true;
 }
 async function loadHead(){
@@ -711,7 +711,7 @@ function mentorTexture(org){
       g.fillStyle='#C9BFC3'; g.font='400 26px "IBM Plex Sans Arabic"';
       g.fillText(m.role_title||orgName(org),w-44,h-96);
       g.fillStyle='#9A8E92'; g.font='400 23px "IBM Plex Sans Arabic"';
-      g.fillText('انقري لقراءة الكلمة كاملة',w-44,h-52);
+      g.fillText('انقر لقراءة الكلمة كاملة',w-44,h-52);
     }else{
       g.fillStyle='#C9A96A'; g.fillRect(w-44-84,h-286,84,4);
       g.fillStyle='#fff'; g.font='600 44px "Noto Kufi Arabic"';
@@ -719,7 +719,7 @@ function mentorTexture(org){
       g.fillStyle='#A99DA2'; g.font='400 27px "IBM Plex Sans Arabic"';
       g.fillText('بانتظار كلمة المشرفة الميدانية',w-44,h-130);
       g.font='500 27px "Noto Kufi Arabic"';
-      const cta='انقري لإضافة كلمتك', cw=g.measureText(cta).width+48;
+      const cta='انقر لإضافة كلمتك', cw=g.measureText(cta).width+48;
       g.fillStyle='rgba(201,169,106,.22)'; rrect(g,w-44-cw,h-104,cw,54,27); g.fill();
       g.strokeStyle='rgba(201,169,106,.75)'; g.lineWidth=2; g.stroke();
       g.fillStyle='#E9D9B4'; g.fillText(cta,w-68,h-68);
@@ -811,7 +811,7 @@ function openBook(org){
   ov.classList.add('show'); ov.setAttribute('aria-hidden','false');
   const m=mentorOf(org), k=mIdx(org);
   $('bkWhere').innerHTML=esc('مشرفات '+orgName(org))+'<small>الكلمة '+(k+1)+' من '+mentorPlaques.length+'</small>';
-  $('bkAdd').textContent=m?'أضيفي كلمة أخرى':'أضيفي كلمتك';
+  $('bkAdd').textContent=m?'أضف كلمة أخرى':'أضف كلمتك';
   $('bkHide').hidden=!(m&&supPass);
 }
 function closeBook(){ finishLeaf(); const ov=$('bookOv'); ov.classList.remove('show'); ov.setAttribute('aria-hidden','true'); bookOrg=null; }
@@ -833,9 +833,9 @@ $('bkHide').onclick=async()=>{
 let mentorFormOrg='';
 function openMentorForm(org){
   mentorFormOrg=org||'';
-  $('mentorForm').reset(); $('dropMPhoto').textContent='اضغطي لاختيار صورة'; $('dropMPhoto').classList.remove('has');
+  $('mentorForm').reset(); $('dropMPhoto').textContent='اضغط لاختيار صورة'; $('dropMPhoto').classList.remove('has');
   fillOrgSelect(); $('mOrg').value=mentorFormOrg||'';
-  $('mentorOrgLbl').textContent=mentorFormOrg?('مشرفات '+orgName(mentorFormOrg)):'اختاري جهتك من القائمة';
+  $('mentorOrgLbl').textContent=mentorFormOrg?('مشرفات '+orgName(mentorFormOrg)):'اختر جهتك من القائمة';
   $('mentorOv').classList.add('show');
 }
 
@@ -847,7 +847,7 @@ function boothTextures(b,i){
       g.fillStyle='#8a1538';g.beginPath();g.arc(w/2,h/2-30,90,0,7);g.fill();
       g.fillStyle='#fff';g.beginPath();g.moveTo(w/2-30,h/2-80);g.lineTo(w/2+50,h/2-30);g.lineTo(w/2-30,h/2+20);g.fill();
       g.direction='rtl';g.textAlign='center';g.font='400 44px "IBM Plex Sans Arabic"';
-      g.fillText('انقري لمشاهدة الفيديو',w/2,h/2+130);
+      g.fillText('انقر لمشاهدة الفيديو',w/2,h/2+130);
       return;
     }
     // بلا فيديو: لوحة نصّية جدارية على طراز شروح المتاحف
@@ -861,7 +861,7 @@ function boothTextures(b,i){
     g.fillStyle='#2B2226';g.font='400 31px "IBM Plex Sans Arabic"';
     let y=172; for(const ln of lines){ y+=wrapText(g,ln,w-52,y,w-104,42,2)*42+8; if(y>h-70)break; }
     g.fillStyle='#8A7C80';g.font='400 26px "IBM Plex Sans Arabic"';g.textAlign='center';
-    g.fillText('انقري لفتح الجناح',w/2,h-26);
+    g.fillText('انقر لفتح الجناح',w/2,h-26);
   });
   const posterFallback=texCanvas(720,1000,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#9c2247');gr.addColorStop(1,'#4a0e22');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='rgba(255,255,255,.08)';for(let k=0;k<12;k++){g.beginPath();g.arc(Math.random()*w,Math.random()*h,40+Math.random()*120,0,7);g.fill();}g.fillStyle='#c9a24d';g.fillRect(60,120,w-120,6);g.direction='rtl';g.textAlign='right';g.fillStyle='#fff';g.font='600 58px "Noto Kufi Arabic"';wrapText(g,b.title||'رحلتي التدريبية',w-60,220,w-120,74,3);g.font='400 37px "IBM Plex Sans Arabic"';g.fillStyle='#F0DEE3';wrapText(g,b.highlights||b.journey||'',w-60,470,w-120,54,6);g.font='500 40px "Noto Kufi Arabic"';g.fillStyle='#C9A96A';g.fillText(b.student_name,w-60,h-140);g.font='400 31px "IBM Plex Sans Arabic"';g.fillStyle='#f4dfe5';g.fillText(orgName(b.org),w-60,h-90);});
   return {plate,placard,posterFallback};
@@ -1184,7 +1184,7 @@ function compressImage(file,max=1600){return new Promise((res,rej)=>{const im=ne
 /* --- إرسال تعليق --- */
 $('composer').onsubmit=async e=>{
   e.preventDefault(); if(!openRef||openRef.b.demo)return;
-  const body=$('cBody').value.trim(), name=$('cName').value.trim(); if(!body&&!recBlob){toast('اكتبي تعليقًا أو سجّلي صوتًا',true);return;}
+  const body=$('cBody').value.trim(), name=$('cName').value.trim(); if(!body&&!recBlob){toast('اكتب تعليقًا أو سجّل صوتًا',true);return;}
   const btn=$('btnSend'); btn.disabled=true; btn.textContent='جارٍ الإرسال…';
   try{
     let audio=null; if(recBlob) audio=await upload(recBlob,'voice','v');
@@ -1195,14 +1195,14 @@ $('composer').onsubmit=async e=>{
 };
 
 /* ================= إضافة جناح ================= */
-$('aOrg').innerHTML='<option value="">— اختاري —</option>'+ORGS.map(o=>'<option value="'+esc(o)+'">'+esc(orgName(o))+'</option>').join('');
+$('aOrg').innerHTML='<option value="">— اختر —</option>'+ORGS.map(o=>'<option value="'+esc(o)+'">'+esc(orgName(o))+'</option>').join('');
 const bindDrop=(dropId,inputId,label)=>{const d=$(dropId),i=$(inputId);d.onclick=()=>i.click();i.onchange=()=>{const f=i.files[0];if(!f){d.textContent=label;d.classList.remove('has');return;}d.textContent='✓ '+f.name+' ('+(f.size/1048576).toFixed(1)+' م.ب)';d.classList.add('has');};};
-bindDrop('dropPoster','aPoster','اضغطي لاختيار صورة'); bindDrop('dropVideo','aVideo','اضغطي لاختيار فيديو');
+bindDrop('dropPoster','aPoster','اضغط لاختيار صورة'); bindDrop('dropVideo','aVideo','اضغط لاختيار فيديو');
 $('btnAdd').onclick=()=>{$('addOv').classList.add('show');}; $('addCancel').onclick=()=>$('addOv').classList.remove('show');
 $('addForm').onsubmit=async e=>{
   e.preventDefault(); const pf=$('aPoster').files[0], vf=$('aVideo').files[0];
-  if(!pf&&!vf){toast('أضيفي بوسترًا أو فيديو على الأقل',true);return;}
-  if(vf&&vf.size>MAX_VIDEO){toast('حجم الفيديو يتجاوز ٤٠ م.ب — اضغطيه أولًا (مثلًا بجودة 720p)',true);return;}
+  if(!pf&&!vf){toast('أضف بوسترًا أو فيديو على الأقل',true);return;}
+  if(vf&&vf.size>MAX_VIDEO){toast('حجم الفيديو يتجاوز ٤٠ م.ب — اضغطه أولًا (مثلًا بجودة 720p)',true);return;}
   const btn=$('addSubmit'), prog=$('addProg'), note=$('addNote'); btn.disabled=true; prog.style.display='block'; const bar=prog.firstElementChild;
   try{
     let poster=null, video=null;
@@ -1210,7 +1210,7 @@ $('addForm').onsubmit=async e=>{
     if(vf){note.textContent='جارٍ رفع الفيديو… قد يستغرق دقيقة';bar.style.width='55%';video=await upload(vf,'videos',vf.name);bar.style.width='90%';}
     const {data,error}=await sb.rpc('gallery_add_booth',{p_uid:$('aUid').value,p_name:$('aName').value,p_org:$('aOrg').value,p_title:$('aTitle').value,p_journey:$('aJourney').value,p_highlights:$('aHi').value,p_message:$('aMsg').value,p_poster:poster,p_video:video});
     if(error) throw error; bar.style.width='100%';
-    toast('نُشر جناحك في المعرض'); $('addOv').classList.remove('show'); $('addForm').reset(); $('dropPoster').textContent='اضغطي لاختيار صورة';$('dropVideo').textContent='اضغطي لاختيار فيديو';$('dropPoster').classList.remove('has');$('dropVideo').classList.remove('has');
+    toast('نُشر جناحك في المعرض'); $('addOv').classList.remove('show'); $('addForm').reset(); $('dropPoster').textContent='اضغط لاختيار صورة';$('dropVideo').textContent='اضغط لاختيار فيديو';$('dropPoster').classList.remove('has');$('dropVideo').classList.remove('has');
     await loadBooths(); buildAll(); goTo(boothObjs.findIndex(r=>r.b.id===data),true);
   }catch(err){console.error(err);toast('تعذّر النشر: '+(err.message||''),true);}
   btn.disabled=false; prog.style.display='none'; bar.style.width='0'; note.textContent='';
@@ -1265,7 +1265,7 @@ let roster={};
 async function loadRoster(){ try{ const {data}=await sb.rpc('gallery_roster_get'); roster=data?JSON.parse(data):{}; }catch(_){ roster={}; } }
 function fillOrgSelect(){
   const sel=$('mOrg');
-  sel.innerHTML='<option value="">— اختاري الجهة —</option>'+ORGS_WALL.map(o=>'<option value="'+esc(o)+'">مشرفات '+esc(orgName(o))+'</option>').join('');
+  sel.innerHTML='<option value="">— اختر الجهة —</option>'+ORGS_WALL.map(o=>'<option value="'+esc(o)+'">مشرفات '+esc(orgName(o))+'</option>').join('');
 }
 function chosenMentorName(){
   const typed=$('mName').value.trim();
@@ -1278,7 +1278,7 @@ $('mentorCancel').onclick=()=>$('mentorOv').classList.remove('show');
 $('mentorForm').onsubmit=async e=>{
   e.preventDefault(); const pf=$('mPhoto').files[0];
   mentorFormOrg=$('mOrg').value;
-  if(!mentorFormOrg){ toast('اختاري المؤسسة التدريبية',true); return; }
+  if(!mentorFormOrg){ toast('اختر المؤسسة التدريبية',true); return; }
 
   const btn=$('mentorSubmit'), prog=$('mentorProg'), bar=prog.firstElementChild, note=$('mentorNote');
   btn.disabled=true; prog.style.display='block';
@@ -1295,13 +1295,13 @@ $('mentorForm').onsubmit=async e=>{
 };
 
 /* --- تحرير كلمة رئيس القسم (المشرفة) --- */
-bindDrop('dropHVideo','hVideo','اضغطي لاختيار فيديو'); bindDrop('dropHPhoto','hPhoto','اضغطي لاختيار صورة');
-bindDrop('dropMPhoto','mPhoto','اضغطي لاختيار صورة');
+bindDrop('dropHVideo','hVideo','اضغط لاختيار فيديو'); bindDrop('dropHPhoto','hPhoto','اضغط لاختيار صورة');
+bindDrop('dropMPhoto','mPhoto','اضغط لاختيار صورة');
 $('btnEditHead').onclick=()=>{$('hName').value=head?.name||'';$('hTitle').value=head?.title||'';$('hText').value=head?.text||'';$('headOv').classList.add('show');};
 $('headCancel').onclick=()=>$('headOv').classList.remove('show');
 $('headForm').onsubmit=async e=>{
   e.preventDefault(); const vf=$('hVideo').files[0], pf=$('hPhoto').files[0];
-  if(vf&&vf.size>MAX_HEAD_VIDEO){toast('حجم الفيديو يتجاوز ٨٠ م.ب — اضغطيه أولًا',true);return;}
+  if(vf&&vf.size>MAX_HEAD_VIDEO){toast('حجم الفيديو يتجاوز ٨٠ م.ب — اضغطه أولًا',true);return;}
   const btn=$('headSubmit'), prog=$('headProg'), bar=prog.firstElementChild, note=$('headNote'); btn.disabled=true; prog.style.display='block';
   try{
     const next={name:$('hName').value.trim(),title:$('hTitle').value.trim(),text:$('hText').value.trim(),video_url:head?.video_url||null,photo_url:head?.photo_url||null};
@@ -1377,7 +1377,7 @@ $('btnShare').onclick=async()=>{
   try{
     if(navigator.share){ await navigator.share({title:'المعرض الافتراضي للتدريب الميداني',url}); return; }
     await navigator.clipboard.writeText(url); toast('نُسخ رابط المعرض');
-  }catch(_){ toast('تعذّر النسخ — انسخي الرابط من شريط العنوان',true); }
+  }catch(_){ toast('تعذّر النسخ — انسخ الرابط من شريط العنوان',true); }
 };
 
 function openGuide(){ $('guideOv').classList.add('show'); }
@@ -1391,7 +1391,7 @@ function deviceId(){
   if(!d){ d='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,10); store.set('galDev',d); }
   return d;
 }
-async function pingVisit(){ try{ await sb.rpc('gallery_visit_ping',{p_dev:deviceId()}); }catch(_){} }
+async function pingVisit(){ try{ if(new URLSearchParams(location.search).get('me')==='1'){ store.set('galMe','1'); await sb.rpc('gallery_visit_forget',{p_dev:deviceId()}); } if(store.get('galMe')==='1') return; await sb.rpc('gallery_visit_ping',{p_dev:deviceId()}); }catch(_){} }
 
 const fmtDay=d=>new Date(d+'T00:00:00').toLocaleDateString('ar-QA',{weekday:'short',day:'numeric',month:'short'});
 const num=n=>Number(n||0).toLocaleString('ar-QA');
